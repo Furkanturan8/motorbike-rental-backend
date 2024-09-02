@@ -1,7 +1,7 @@
 package viewmodel
 
 import (
-	"motorbike-rental-backend/internal/app/models"
+	"motorbike-rental-backend/internal/app/user-and-auth/models"
 )
 
 type UserDetailVMForAdmin struct {

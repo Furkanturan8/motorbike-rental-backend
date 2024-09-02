@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"motorbike-rental-backend/internal/app/handlers"
-	"motorbike-rental-backend/internal/app/services"
+	"motorbike-rental-backend/internal/app/user-and-auth/handlers"
+	"motorbike-rental-backend/internal/app/user-and-auth/services"
 	"motorbike-rental-backend/pkg/app"
 	"motorbike-rental-backend/pkg/router"
 	"time"

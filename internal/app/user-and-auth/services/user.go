@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"motorbike-rental-backend/internal/app/models"
+	"motorbike-rental-backend/internal/app/user-and-auth/models"
 	"motorbike-rental-backend/pkg/errorsx"
 
 	"gorm.io/gorm"

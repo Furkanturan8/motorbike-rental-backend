@@ -3,8 +3,8 @@ package handlers
 import (
 	"errors"
 	"github.com/golang-jwt/jwt/v4"
-	"motorbike-rental-backend/internal/app/services"
-	viewmodel "motorbike-rental-backend/internal/app/viewmodels"
+	"motorbike-rental-backend/internal/app/user-and-auth/services"
+	"motorbike-rental-backend/internal/app/user-and-auth/viewmodels"
 	"motorbike-rental-backend/pkg/app"
 	"motorbike-rental-backend/pkg/errorsx"
 	"motorbike-rental-backend/pkg/utils"

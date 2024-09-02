@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"errors"
-	"motorbike-rental-backend/internal/app/models"
+	"motorbike-rental-backend/internal/app/user-and-auth/models"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"

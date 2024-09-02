@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"motorbike-rental-backend/internal/app/models"
+	"motorbike-rental-backend/internal/app/user-and-auth/models"
 	"motorbike-rental-backend/pkg/config"
 
 	"github.com/gofiber/fiber/v2/log"

@@ -3,9 +3,9 @@ package handlers
 import (
 	"errors"
 	"fmt"
-	"motorbike-rental-backend/internal/app/models"
-	"motorbike-rental-backend/internal/app/services"
-	viewmodel "motorbike-rental-backend/internal/app/viewmodels"
+	"motorbike-rental-backend/internal/app/user-and-auth/models"
+	"motorbike-rental-backend/internal/app/user-and-auth/services"
+	"motorbike-rental-backend/internal/app/user-and-auth/viewmodels"
 	"motorbike-rental-backend/pkg/app"
 	"motorbike-rental-backend/pkg/errorsx"
 
