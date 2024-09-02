@@ -26,6 +26,20 @@ CREATE TABLE IF NOT EXISTS auth_refresh_tokens (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS motorbike (
+    id SERIAL PRIMARY KEY,
+    model VARCHAR(100) NOT NULL,
+    location_latitude DOUBLE PRECISION NOT NULL,
+    location_longitude DOUBLE PRECISION NOT NULL,
+    status VARCHAR(20) NOT NULL CHECK (status IN ('available', 'maintenance', 'rented')),
+    photo_urls JSONB, -- JSON veri tipini kullanarak bir dizi URL saklayacağız
+    lock_status VARCHAR(10) NOT NULL CHECK (lock_status IN ('locked', 'unlocked')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
+);
+
+
 -- Insert default admin user
 DO $$
 BEGIN

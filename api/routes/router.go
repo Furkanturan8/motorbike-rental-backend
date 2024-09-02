@@ -1,6 +1,8 @@
 package routes
 
 import (
+	bikeHandler "motorbike-rental-backend/internal/app/motorbike/handlers"
+	bikeService "motorbike-rental-backend/internal/app/motorbike/services"
 	"motorbike-rental-backend/internal/app/user-and-auth/handlers"
 	"motorbike-rental-backend/internal/app/user-and-auth/services"
 	"motorbike-rental-backend/pkg/app"
@@ -22,16 +24,19 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	authService := services.NewAuthService(app.DB, app.Cfg.Server.JwtSecret, app.Cfg.Server.JwtAccessTokenExpireMinute*time.Minute, app.Cfg.Server.JwtRefreshTokenExpireHour*time.Hour)
 	authHandler := handlers.NewAuthHandler(authService, userService)
 
+	motorService := bikeService.NewMotorService(app.DB)
+	motorHandler := bikeHandler.NewMotorHandler(motorService)
+
 	api := app.FiberApp.Group("/api")
 
-	router.Post(api, "/user/create", userHandler.CreateUser) // yeni bir kullanıcı hesap oluşturur
+	router.Post(api, "/user/create", userHandler.CreateUser)
 	router.Post(api, "/auth/login", authHandler.Login)
 	router.Post(api, "/auth/refresh", authHandler.RefreshToken)
 
 	api.Use(router.JWTMiddleware(app))
 
 	router.Get(api, "/user/me", userHandler.Me)
-	router.Get(api, "/users", userHandler.GetAllUsers) // tüm kullanıcıları getirir
+	router.Get(api, "/users", userHandler.GetAllUsers)
 	router.Put(api, "/user/me", userHandler.MeUpdate)
 
 	router.Post(api, "/auth/logout", authHandler.Logout)
@@ -40,10 +45,13 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	adminRoutes := api.Group("")
 	adminRoutes.Use(router.AdminControlMiddleware)
 
-	router.Post(adminRoutes, "/user/create", userHandler.CreateUser)       // admin yeni kullanıcı ekleyebilir
-	router.Post(adminRoutes, "/user/createAdmin", userHandler.CreateAdmin) // admin yeni bir admin ekleyebilir
-	router.Post(adminRoutes, "/user/:id", userHandler.DeleteByUserID)      // kullanıcı silme
-	router.Get(adminRoutes, "/users/:id", userHandler.GetByUserID)         // belli bir kullanıcıyı getirir
+	router.Post(adminRoutes, "/user/create", userHandler.CreateUser)
+	router.Post(adminRoutes, "/user/createAdmin", userHandler.CreateAdmin)
+	router.Post(adminRoutes, "/user/:id", userHandler.DeleteByUserID)
+	router.Get(adminRoutes, "/users/:id", userHandler.GetByUserID)
 	router.Put(adminRoutes, "/user/update/:id", userHandler.UpdateUserByID)
+
+	// motorbike operations
+	router.Post(adminRoutes, "/motorbike", motorHandler.CreateMotor)
 
 }

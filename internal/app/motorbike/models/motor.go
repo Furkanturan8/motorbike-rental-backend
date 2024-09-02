@@ -22,7 +22,7 @@ type Motorbike struct {
 	LocationLatitude  float64         `gorm:"not null"`
 	LocationLongitude float64         `gorm:"not null"`
 	Status            MotorBikeStatus `gorm:"type:varchar(20);not null"` // ENUM gibi çalışacak şekilde varchar tanımlandı
-	PhotoURLs         []string        `gorm:"type:json"`
+	PhotoURLs         []string        `gorm:"type:jsonb"`
 	LockStatus        LockStatus      `gorm:"type:varchar(10);not null"` // ENUM gibi çalışacak şekilde varchar tanımlandı
 }
 

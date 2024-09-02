@@ -6,3 +6,5 @@ DROP TABLE IF EXISTS auth_refresh_tokens;
 -- Drop Users Table
 DROP TABLE IF EXISTS users;
 
+-- Drop Motorbike Table
+DROP TABLE IF EXISTS motorbike;
