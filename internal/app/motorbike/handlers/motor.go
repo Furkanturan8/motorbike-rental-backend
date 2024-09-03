@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 	"motorbike-rental-backend/internal/app/motorbike/models"
 	bikeService "motorbike-rental-backend/internal/app/motorbike/services"
 	viewmodel "motorbike-rental-backend/internal/app/motorbike/viewmodels"
@@ -69,6 +71,24 @@ func (h MotorHandler) UpdateMotor(ctx *app.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Motorsiklet güncellendi!"})
+}
+
+func (h MotorHandler) DeleteMotor(ctx *app.Ctx) error {
+	param := ctx.Params("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz ID!"})
+	}
+
+	err = h.bikeService.DeleteMotor(ctx.Context(), id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Motor bulunamadı!"})
+		}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Motor silinirken bir hata oluştu!"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Motor başarıyla silindi!"})
 }
 
 func (h MotorHandler) GetAllMotors(ctx *app.Ctx) error {

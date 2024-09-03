@@ -2,13 +2,16 @@ package services
 
 import (
 	"context"
+	"errors"
 	"gorm.io/gorm"
 	"motorbike-rental-backend/internal/app/motorbike/models"
+	"time"
 )
 
 type IMotorService interface {
 	CreateMotor(ctx context.Context, motorbike *models.Motorbike) error
 	UpdateMotor(ctx context.Context, motorbike *models.Motorbike) error
+	DeleteMotor(ctx context.Context, motorbikeID int) error
 	UpdatePhotosForMotor(ctx context.Context, newPhotos []models.MotorbikePhoto, motorbikeID int) error
 	AddPhotosToMotor(ctx context.Context, photos []models.MotorbikePhoto) error
 	GetPhotosByID(ctx context.Context, motorbikeID string, photos *[]models.MotorbikePhoto) error
@@ -30,6 +33,29 @@ func (s *MotorService) CreateMotor(ctx context.Context, motorbike *models.Motorb
 
 func (s *MotorService) UpdateMotor(ctx context.Context, motorbike *models.Motorbike) error {
 	return s.DB.WithContext(ctx).Save(motorbike).Error
+}
+
+func (s *MotorService) DeleteMotor(ctx context.Context, motorbikeID int) error {
+	// Motoru bul
+	var motor models.Motorbike
+	if err := s.DB.WithContext(ctx).Where("id = ?", motorbikeID).First(&motor).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return err // Motor bulunamadı
+		}
+		return err // Diğer hata durumları
+	}
+
+	// önce motorun bağlı olduğu fotoğrafları silelim
+	if err := s.DB.WithContext(ctx).Where("motorbike_id = ?", motorbikeID).Delete(&models.MotorbikePhoto{}).Error; err != nil {
+		return err
+	}
+
+	// Motoru sil
+	if err := s.DB.WithContext(ctx).Model(&motor).Update("deleted_at", time.Now()).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *MotorService) UpdatePhotosForMotor(ctx context.Context, newPhotos []models.MotorbikePhoto, motorbikeID int) error {
