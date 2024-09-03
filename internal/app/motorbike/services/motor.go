@@ -12,6 +12,9 @@ type IMotorService interface {
 	GetPhotosByID(ctx context.Context, motorbikeID string, photos *[]models.MotorbikePhoto) error
 	GetAllMotors(ctx context.Context) (*[]models.Motorbike, error)
 	GetMotorByID(ctx context.Context, motorbikeID int) (*models.Motorbike, error)
+	GetAvailableMotors(ctx context.Context) (*[]models.Motorbike, error)
+	GetMaintenanceMotors(ctx context.Context) (*[]models.Motorbike, error)
+	GetRentedMotors(ctx context.Context) (*[]models.Motorbike, error)
 }
 type MotorService struct {
 	DB *gorm.DB
@@ -49,4 +52,31 @@ func (s *MotorService) GetMotorByID(ctx context.Context, motorbikeID int) (*mode
 	}
 
 	return &motor, nil
+}
+
+func (s *MotorService) GetAvailableMotors(ctx context.Context) (*[]models.Motorbike, error) {
+	var motors []models.Motorbike
+	if err := s.DB.WithContext(ctx).Where("status = ?", models.BikeAvailable).Find(&motors).Error; err != nil {
+		return nil, err
+	}
+
+	return &motors, nil
+}
+
+func (s *MotorService) GetMaintenanceMotors(ctx context.Context) (*[]models.Motorbike, error) {
+	var motors []models.Motorbike
+	if err := s.DB.WithContext(ctx).Where("status = ?", models.BikeInMaintenance).Find(&motors).Error; err != nil {
+		return nil, err
+	}
+
+	return &motors, nil
+}
+
+func (s *MotorService) GetRentedMotors(ctx context.Context) (*[]models.Motorbike, error) {
+	var motors []models.Motorbike
+	if err := s.DB.WithContext(ctx).Where("status = ?", models.BikeRented).Find(&motors).Error; err != nil {
+		return nil, err
+	}
+
+	return &motors, nil
 }

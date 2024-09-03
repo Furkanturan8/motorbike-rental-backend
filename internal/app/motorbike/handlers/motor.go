@@ -107,3 +107,87 @@ func (h MotorHandler) GetMotorByID(ctx *app.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(motorDetail)
 }
+
+func (h MotorHandler) GetAvailableMotors(ctx *app.Ctx) error {
+	motors, err := h.bikeService.GetAvailableMotors(ctx.Context())
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Bir hata oluştu!"})
+	}
+
+	if len(*motors) == 0 {
+		return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Müsait motor yok!"})
+	} else {
+		var motorDetails []viewmodel.BikeDetailVM
+
+		for _, motor := range *motors {
+			// Her motorun fotoğraflarını al
+			var photos []models.MotorbikePhoto
+			err := h.bikeService.GetPhotosByID(ctx.Context(), strconv.FormatInt(motor.ID, 10), &photos)
+			if err != nil {
+				return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Motorlar getirilirken bir hata oluştu."})
+			}
+
+			// Motor detaylarını oluştur
+			motorDetail := viewmodel.NewBikeDetailVM(motor, photos)
+			motorDetails = append(motorDetails, motorDetail)
+		}
+
+		return ctx.Status(fiber.StatusOK).JSON(motorDetails)
+	}
+}
+
+func (h MotorHandler) GetMaintenanceMotors(ctx *app.Ctx) error {
+	motors, err := h.bikeService.GetMaintenanceMotors(ctx.Context())
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Bir hata oluştu!"})
+	}
+
+	if len(*motors) == 0 {
+		return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "bakımda motor yok!"})
+	} else {
+		var motorDetails []viewmodel.BikeDetailVM
+
+		for _, motor := range *motors {
+			// Her motorun fotoğraflarını al
+			var photos []models.MotorbikePhoto
+			err := h.bikeService.GetPhotosByID(ctx.Context(), strconv.FormatInt(motor.ID, 10), &photos)
+			if err != nil {
+				return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Motorlar getirilirken bir hata oluştu."})
+			}
+
+			// Motor detaylarını oluştur
+			motorDetail := viewmodel.NewBikeDetailVM(motor, photos)
+			motorDetails = append(motorDetails, motorDetail)
+		}
+
+		return ctx.Status(fiber.StatusOK).JSON(motorDetails)
+	}
+}
+
+func (h MotorHandler) GetRentedMotors(ctx *app.Ctx) error {
+	motors, err := h.bikeService.GetRentedMotors(ctx.Context())
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Bir hata oluştu!"})
+	}
+
+	if len(*motors) == 0 {
+		return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "kiralanmış motor yok!"})
+	} else {
+		var motorDetails []viewmodel.BikeDetailVM
+
+		for _, motor := range *motors {
+			// Her motorun fotoğraflarını al
+			var photos []models.MotorbikePhoto
+			err := h.bikeService.GetPhotosByID(ctx.Context(), strconv.FormatInt(motor.ID, 10), &photos)
+			if err != nil {
+				return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Motorlar getirilirken bir hata oluştu."})
+			}
+
+			// Motor detaylarını oluştur
+			motorDetail := viewmodel.NewBikeDetailVM(motor, photos)
+			motorDetails = append(motorDetails, motorDetail)
+		}
+
+		return ctx.Status(fiber.StatusOK).JSON(motorDetails)
+	}
+}

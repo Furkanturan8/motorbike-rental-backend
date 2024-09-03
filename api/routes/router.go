@@ -36,7 +36,6 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	api.Use(router.JWTMiddleware(app))
 
 	router.Get(api, "/user/me", userHandler.Me)
-	router.Get(api, "/users", userHandler.GetAllUsers)
 	router.Put(api, "/user/me", userHandler.MeUpdate)
 
 	router.Post(api, "/auth/logout", authHandler.Logout)
@@ -45,15 +44,20 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	adminRoutes := api.Group("")
 	adminRoutes.Use(router.AdminControlMiddleware)
 
+	// user operations
+	router.Get(adminRoutes, "/users", userHandler.GetAllUsers)
+	router.Get(adminRoutes, "/users/:id", userHandler.GetByUserID)
 	router.Post(adminRoutes, "/user/create", userHandler.CreateUser)
 	router.Post(adminRoutes, "/user/createAdmin", userHandler.CreateAdmin)
 	router.Post(adminRoutes, "/user/:id", userHandler.DeleteByUserID)
-	router.Get(adminRoutes, "/users/:id", userHandler.GetByUserID)
 	router.Put(adminRoutes, "/user/update/:id", userHandler.UpdateUserByID)
 
 	// motorbike operations
 	router.Post(adminRoutes, "/motorbike", motorHandler.CreateMotor)
 	router.Get(adminRoutes, "/motorbikes", motorHandler.GetAllMotors)
 	router.Get(adminRoutes, "/motorbikes/:id", motorHandler.GetMotorByID)
+	router.Get(adminRoutes, "/available-motorbikes", motorHandler.GetAvailableMotors)
+	router.Get(adminRoutes, "/maintenance-motorbikes", motorHandler.GetMaintenanceMotors)
+	router.Get(adminRoutes, "/rented-motorbikes", motorHandler.GetRentedMotors)
 	router.Get(adminRoutes, "/motorbike-photos/:id", motorHandler.GetPhotosByID)
 }
