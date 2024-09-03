@@ -9,8 +9,9 @@ import (
 type IMotorService interface {
 	CreateMotorbike(ctx context.Context, motorbike *models.Motorbike) error
 	AddPhotosToMotorbike(ctx context.Context, photos []models.MotorbikePhoto) error
-	GetPhotosByMotorbikeID(ctx context.Context, motorbikeID string, photos *[]models.MotorbikePhoto) error
+	GetPhotosByID(ctx context.Context, motorbikeID string, photos *[]models.MotorbikePhoto) error
 	GetAllMotors(ctx context.Context) (*[]models.Motorbike, error)
+	GetMotorByID(ctx context.Context, motorbikeID int) (*models.Motorbike, error)
 }
 type MotorService struct {
 	DB *gorm.DB
@@ -37,6 +38,15 @@ func (s *MotorService) GetAllMotors(ctx context.Context) (*[]models.Motorbike, e
 	return &motors, nil
 }
 
-func (s *MotorService) GetPhotosByMotorbikeID(ctx context.Context, motorbikeID string, photos *[]models.MotorbikePhoto) error {
+func (s *MotorService) GetPhotosByID(ctx context.Context, motorbikeID string, photos *[]models.MotorbikePhoto) error {
 	return s.DB.WithContext(ctx).Where("motorbike_id = ?", motorbikeID).Find(photos).Error
+}
+
+func (s *MotorService) GetMotorByID(ctx context.Context, motorbikeID int) (*models.Motorbike, error) {
+	var motor models.Motorbike
+	if err := s.DB.WithContext(ctx).Where("id = ?", motorbikeID).First(&motor).Error; err != nil {
+		return nil, err
+	}
+
+	return &motor, nil
 }
