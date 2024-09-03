@@ -109,7 +109,7 @@ func (h MotorHandler) GetMotorByID(ctx *app.Ctx) error {
 }
 
 func (h MotorHandler) GetAvailableMotors(ctx *app.Ctx) error {
-	motors, err := h.bikeService.GetAvailableMotors(ctx.Context())
+	motors, err := h.bikeService.GetMotorsForStatus(ctx.Context(), string(models.BikeAvailable))
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Bir hata oluştu!"})
 	}
@@ -137,7 +137,7 @@ func (h MotorHandler) GetAvailableMotors(ctx *app.Ctx) error {
 }
 
 func (h MotorHandler) GetMaintenanceMotors(ctx *app.Ctx) error {
-	motors, err := h.bikeService.GetMaintenanceMotors(ctx.Context())
+	motors, err := h.bikeService.GetMotorsForStatus(ctx.Context(), string(models.BikeInMaintenance))
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Bir hata oluştu!"})
 	}
@@ -165,7 +165,7 @@ func (h MotorHandler) GetMaintenanceMotors(ctx *app.Ctx) error {
 }
 
 func (h MotorHandler) GetRentedMotors(ctx *app.Ctx) error {
-	motors, err := h.bikeService.GetRentedMotors(ctx.Context())
+	motors, err := h.bikeService.GetMotorsForStatus(ctx.Context(), string(models.BikeRented))
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Bir hata oluştu!"})
 	}
