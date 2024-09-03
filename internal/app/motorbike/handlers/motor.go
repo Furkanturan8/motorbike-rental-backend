@@ -25,16 +25,50 @@ func (h MotorHandler) CreateMotor(ctx *app.Ctx) error {
 
 	motorbike := bikeCreateVM.ToDBModel()
 
-	if err := h.bikeService.CreateMotorbike(ctx.Context(), &motorbike); err != nil {
+	if err := h.bikeService.CreateMotor(ctx.Context(), &motorbike); err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Motor oluşturulurken bir hata oluştu."})
 	}
 
 	photoModels := bikeCreateVM.ToPhotoModels(int(motorbike.ID))
-	if err := h.bikeService.AddPhotosToMotorbike(ctx.Context(), photoModels); err != nil {
+	if err := h.bikeService.AddPhotosToMotor(ctx.Context(), photoModels); err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Fotoğraflar eklenirken bir hata oluştu."})
 	}
 
-	return ctx.Status(fiber.StatusCreated).JSON(motorbike)
+	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{"info": "Motorsiklet Eklendi!"})
+}
+
+func (h MotorHandler) UpdateMotor(ctx *app.Ctx) error {
+	var bikeUpdateVM viewmodel.BikeUpdateVM
+	if err := ctx.BodyParser(&bikeUpdateVM); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz istek."})
+	}
+
+	param := ctx.Params("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz ID."})
+	}
+
+	motorbike, err := h.bikeService.GetMotorByID(ctx.Context(), id)
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Motor bulunamadı."})
+	}
+
+	// Güncelleme verilerini motor modeline uygula
+	updatedMotorbike := bikeUpdateVM.ToDBModel(*motorbike)
+	if err := h.bikeService.UpdateMotor(ctx.Context(), &updatedMotorbike); err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Motor güncellenirken bir hata oluştu."})
+	}
+
+	// Eğer fotoğraflar girilmişse güncelle (json da foto değerleri girilmemişse eskiler kalsın)
+	if len(bikeUpdateVM.Photos) > 0 {
+		photoModels := bikeUpdateVM.ToPhotoModels(id)
+		if err := h.bikeService.UpdatePhotosForMotor(ctx.Context(), photoModels, id); err != nil {
+			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Fotoğraflar güncellenirken bir hata oluştu."})
+		}
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Motorsiklet güncellendi!"})
 }
 
 func (h MotorHandler) GetAllMotors(ctx *app.Ctx) error {

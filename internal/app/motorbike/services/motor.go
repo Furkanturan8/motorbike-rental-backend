@@ -7,8 +7,10 @@ import (
 )
 
 type IMotorService interface {
-	CreateMotorbike(ctx context.Context, motorbike *models.Motorbike) error
-	AddPhotosToMotorbike(ctx context.Context, photos []models.MotorbikePhoto) error
+	CreateMotor(ctx context.Context, motorbike *models.Motorbike) error
+	UpdateMotor(ctx context.Context, motorbike *models.Motorbike) error
+	UpdatePhotosForMotor(ctx context.Context, newPhotos []models.MotorbikePhoto, motorbikeID int) error
+	AddPhotosToMotor(ctx context.Context, photos []models.MotorbikePhoto) error
 	GetPhotosByID(ctx context.Context, motorbikeID string, photos *[]models.MotorbikePhoto) error
 	GetAllMotors(ctx context.Context) (*[]models.Motorbike, error)
 	GetMotorByID(ctx context.Context, motorbikeID int) (*models.Motorbike, error)
@@ -22,11 +24,32 @@ func NewMotorService(db *gorm.DB) IMotorService {
 	return &MotorService{DB: db}
 }
 
-func (s *MotorService) CreateMotorbike(ctx context.Context, motorbike *models.Motorbike) error {
+func (s *MotorService) CreateMotor(ctx context.Context, motorbike *models.Motorbike) error {
 	return s.DB.WithContext(ctx).Create(motorbike).Error
 }
 
-func (s *MotorService) AddPhotosToMotorbike(ctx context.Context, photos []models.MotorbikePhoto) error {
+func (s *MotorService) UpdateMotor(ctx context.Context, motorbike *models.Motorbike) error {
+	return s.DB.WithContext(ctx).Save(motorbike).Error
+}
+
+func (s *MotorService) UpdatePhotosForMotor(ctx context.Context, newPhotos []models.MotorbikePhoto, motorbikeID int) error {
+	// Önce mevcut fotoğrafları sil
+	if err := s.DB.WithContext(ctx).Where("motorbike_id = ?", motorbikeID).Delete(&models.MotorbikePhoto{}).Error; err != nil {
+		return err
+	}
+
+	// Yeni fotoğrafları ekle
+	for _, photo := range newPhotos {
+		photo.MotorbikeID = motorbikeID
+		if err := s.DB.WithContext(ctx).Create(&photo).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *MotorService) AddPhotosToMotor(ctx context.Context, photos []models.MotorbikePhoto) error {
 	return s.DB.WithContext(ctx).Create(&photos).Error
 }
 

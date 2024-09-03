@@ -63,6 +63,18 @@ func (vm BikeUpdateVM) ToDBModel(m models.Motorbike) models.Motorbike {
 	return m
 }
 
+// Fotoğraf modellerine dönüştürme
+func (vm BikeUpdateVM) ToPhotoModels(motorbikeID int) []models.MotorbikePhoto {
+	var photos []models.MotorbikePhoto
+	for _, photoVM := range vm.Photos {
+		photos = append(photos, models.MotorbikePhoto{
+			MotorbikeID: motorbikeID,
+			PhotoURL:    photoVM.PhotoURL,
+		})
+	}
+	return photos
+}
+
 // Fotoğraf detayları için view model
 type PhotoDetailVM struct {
 	ID          int    `json:"id"`

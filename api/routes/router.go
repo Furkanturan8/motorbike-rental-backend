@@ -54,6 +54,7 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 
 	// motorbike operations
 	router.Post(adminRoutes, "/motorbike", motorHandler.CreateMotor)
+	router.Put(adminRoutes, "/motorbike/:id", motorHandler.UpdateMotor)
 	router.Get(adminRoutes, "/motorbikes", motorHandler.GetAllMotors)
 	router.Get(adminRoutes, "/motorbikes/:id", motorHandler.GetMotorByID)
 	router.Get(adminRoutes, "/available-motorbikes", motorHandler.GetAvailableMotors)
