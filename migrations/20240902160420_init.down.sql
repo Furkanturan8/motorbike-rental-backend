@@ -8,3 +8,5 @@ DROP TABLE IF EXISTS users;
 
 -- Drop Motorbike Table
 DROP TABLE IF EXISTS motorbike;
+
+DROP TABLE IF EXISTS motorbike_photos;

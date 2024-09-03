@@ -53,5 +53,6 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 
 	// motorbike operations
 	router.Post(adminRoutes, "/motorbike", motorHandler.CreateMotor)
-
+	router.Get(adminRoutes, "/motorbikes", motorHandler.GetAllMotors)
+	router.Get(adminRoutes, "/motorbike-photos/:id", motorHandler.GetMotorPhotos)
 }
