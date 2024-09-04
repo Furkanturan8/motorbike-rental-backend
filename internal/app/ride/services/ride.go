@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"gorm.io/gorm"
+	modelBike "motorbike-rental-backend/internal/app/motorbike/models"
 	"motorbike-rental-backend/internal/app/ride/models"
 	modelUser "motorbike-rental-backend/internal/app/user-and-auth/models"
 )
@@ -13,6 +14,7 @@ type IRideService interface {
 	CreateRide(ctx context.Context, ride *models.Ride) error
 	GetRidesByUserID(ctx context.Context, userID int) (*[]models.Ride, error)
 	GetRideByUserID(ctx context.Context, userID int, rideID int) (*models.Ride, error)
+	GetRidesByBikeID(ctx context.Context, bikeID int) (*[]models.Ride, error)
 }
 
 type RideService struct {
@@ -71,4 +73,19 @@ func (s *RideService) GetRideByUserID(ctx context.Context, userID int, rideID in
 		return nil, err
 	}
 	return &ride, nil
+}
+
+func (s *RideService) GetRidesByBikeID(ctx context.Context, bikeID int) (*[]models.Ride, error) {
+	var motor modelBike.Motorbike
+	var rides []models.Ride
+
+	if err := s.DB.WithContext(ctx).Where("id = ?", bikeID).First(&motor).Error; err != nil {
+		return nil, err
+	}
+
+	if err := s.DB.WithContext(ctx).Where("motorbike_id = ?", bikeID).Find(&rides).Error; err != nil {
+		return nil, err
+	}
+
+	return &rides, nil
 }

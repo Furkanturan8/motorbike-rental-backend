@@ -124,3 +124,29 @@ func (h RideHandler) GetRideByUserID(ctx *app.Ctx) error {
 
 	return ctx.SuccessResponse(rideDetail, 1) // pkg/errorsx.go sınıfından
 }
+
+func (h RideHandler) GetRidesByBikeID(ctx *app.Ctx) error {
+	param := ctx.Params("bikeID")
+	bikeID, err := strconv.Atoi(param)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Hatalı istek!"})
+	}
+
+	rides, err := h.rideService.GetRidesByBikeID(ctx.Context(), bikeID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Bu motor yok!"})
+		}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Bu motora ait sürüş getirilirken hata oluştu!"})
+	}
+
+	var rideDetails []viewmodels.RideDetailVM
+
+	for _, ride := range *rides {
+		vm := viewmodels.RideDetailVM{}
+		rideDetail := vm.ToDBModel(ride)
+		rideDetails = append(rideDetails, rideDetail)
+	}
+
+	return ctx.SuccessResponse(rideDetails, len(rideDetails))
+}
