@@ -71,3 +71,56 @@ func (h RideHandler) CreateRide(ctx *app.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Sürüş eklendi!"})
 }
+
+func (h RideHandler) GetRidesByUserID(ctx *app.Ctx) error {
+	param := ctx.Params("userID")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Hatalı istek!"})
+	}
+
+	rides, err := h.rideService.GetRidesByUserID(ctx.Context(), id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Bu kullanıcı bulunamadı!"})
+		}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Sürüş detayları getirilirken hata oluştu!"})
+	}
+
+	var rideDetails []viewmodels.RideDetailVM
+
+	for _, ride := range *rides {
+		vm := viewmodels.RideDetailVM{}
+		rideDetail := vm.ToDBModel(ride)
+		rideDetails = append(rideDetails, rideDetail)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(rideDetails)
+}
+
+func (h RideHandler) GetRideByUserID(ctx *app.Ctx) error {
+	param1 := ctx.Params("userID")
+	userID, err := strconv.Atoi(param1)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Hatalı istek!"})
+	}
+
+	param2 := ctx.Params("rideID")
+	rideID, err := strconv.Atoi(param2)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Hatalı istek!"})
+	}
+
+	ride, err := h.rideService.GetRideByUserID(ctx.Context(), userID, rideID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Bu kullanıcının ilgili sürüşü bulunamadı!"})
+		}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Sürüş detayları getirilirken hata oluştu!"})
+	}
+
+	var vm viewmodels.RideDetailVM
+	rideDetail := vm.ToDBModel(*ride)
+
+	return ctx.SuccessResponse(rideDetail, 1) // pkg/errorsx.go sınıfından
+}

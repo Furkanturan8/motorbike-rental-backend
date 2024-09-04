@@ -72,4 +72,6 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Get(adminRoutes, "/rides", rideHandler.GetAllRides)
 	router.Get(adminRoutes, "/rides/:id", rideHandler.GetRideByID)
 	router.Post(adminRoutes, "/ride", rideHandler.CreateRide)
+	router.Get(adminRoutes, "/rides/user/:userID", rideHandler.GetRidesByUserID)
+	router.Get(adminRoutes, "/users/:userID/rides/:rideID", rideHandler.GetRideByUserID)
 }
