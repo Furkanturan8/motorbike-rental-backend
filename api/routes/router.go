@@ -1,8 +1,10 @@
 package routes
 
 import (
-	bikeHandler "motorbike-rental-backend/internal/app/motorbike/handlers"
-	bikeService "motorbike-rental-backend/internal/app/motorbike/services"
+	motor_Handler "motorbike-rental-backend/internal/app/motorbike/handlers"
+	motor_Service "motorbike-rental-backend/internal/app/motorbike/services"
+	ride_Handler "motorbike-rental-backend/internal/app/ride/handlers"
+	ride_Service "motorbike-rental-backend/internal/app/ride/services"
 	"motorbike-rental-backend/internal/app/user-and-auth/handlers"
 	"motorbike-rental-backend/internal/app/user-and-auth/services"
 	"motorbike-rental-backend/pkg/app"
@@ -24,8 +26,11 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	authService := services.NewAuthService(app.DB, app.Cfg.Server.JwtSecret, app.Cfg.Server.JwtAccessTokenExpireMinute*time.Minute, app.Cfg.Server.JwtRefreshTokenExpireHour*time.Hour)
 	authHandler := handlers.NewAuthHandler(authService, userService)
 
-	motorService := bikeService.NewMotorService(app.DB)
-	motorHandler := bikeHandler.NewMotorHandler(motorService)
+	motorService := motor_Service.NewMotorService(app.DB)
+	motorHandler := motor_Handler.NewMotorHandler(motorService)
+
+	rideService := ride_Service.NewRideService(app.DB)
+	rideHandler := ride_Handler.NewRideHandler(rideService)
 
 	api := app.FiberApp.Group("/api")
 
@@ -62,4 +67,7 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Get(adminRoutes, "/maintenance-motorbikes", motorHandler.GetMaintenanceMotors)
 	router.Get(adminRoutes, "/rented-motorbikes", motorHandler.GetRentedMotors)
 	router.Get(adminRoutes, "/motorbike-photos/:id", motorHandler.GetPhotosByID)
+
+	// ride operations
+	router.Get(adminRoutes, "/rides", rideHandler.GetAllRides)
 }

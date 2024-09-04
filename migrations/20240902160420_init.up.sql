@@ -47,6 +47,26 @@ CREATE TABLE IF NOT EXISTS motorbike_photos (
     deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
 
+CREATE TABLE IF NOT EXISTS rides (
+     id SERIAL PRIMARY KEY,
+     user_id INT NOT NULL,
+     motorbike_id INT NOT NULL,
+     start_time TIMESTAMPTZ NOT NULL,
+     end_time TIMESTAMPTZ,
+     duration INTERVAL NOT NULL,
+     cost NUMERIC(10, 2) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (motorbike_id) REFERENCES motorbike(id) ON DELETE RESTRICT
+);
+
+-- Optional: Create indexes on foreign keys for better performance
+CREATE INDEX idx_rides_user_id ON rides(user_id);
+CREATE INDEX idx_rides_motorbike_id ON rides(motorbike_id);
+
+
 -- Insert default admin user
 DO $$
 BEGIN
