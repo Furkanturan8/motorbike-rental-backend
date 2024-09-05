@@ -37,18 +37,18 @@ type RideUpdateVM struct {
 	Cost        float64    `json:"cost" validate:"required"`
 }
 
-func (vm *RideUpdateVM) ToDBModel() models.Ride {
+func (vm *RideUpdateVM) ToDBModel(m models.Ride) models.Ride {
+	m.UserID = vm.UserID
+	m.MotorbikeID = vm.MotorbikeID
+	m.EndTime = vm.EndTime
+	m.Duration = vm.Duration
+	m.Cost = vm.Cost
 
-	return models.Ride{
-		UserID:      vm.UserID,
-		MotorbikeID: vm.MotorbikeID,
-		EndTime:     vm.EndTime,
-		Duration:    vm.Duration,
-		Cost:        vm.Cost,
-	}
+	return m
 }
 
 type RideDetailVM struct {
+	ID          uint       `json:"id"`
 	UserID      uint       `json:"user_id"`
 	MotorbikeID uint       `json:"motorbike_id"`
 	StartTime   time.Time  `json:"start_time"`
@@ -59,6 +59,7 @@ type RideDetailVM struct {
 
 func (vm *RideDetailVM) ToDBModel(ride models.Ride) RideDetailVM {
 	return RideDetailVM{
+		ID:          uint(ride.ID),
 		UserID:      ride.UserID,
 		MotorbikeID: ride.MotorbikeID,
 		StartTime:   ride.StartTime,

@@ -15,6 +15,8 @@ type IRideService interface {
 	GetRidesByUserID(ctx context.Context, userID int) (*[]models.Ride, error)
 	GetRideByUserID(ctx context.Context, userID int, rideID int) (*models.Ride, error)
 	GetRidesByBikeID(ctx context.Context, bikeID int) (*[]models.Ride, error)
+	UpdateRide(ctx context.Context, ride *models.Ride) error
+	DeleteRide(ctx context.Context, id int) error
 }
 
 type RideService struct {
@@ -88,4 +90,17 @@ func (s *RideService) GetRidesByBikeID(ctx context.Context, bikeID int) (*[]mode
 	}
 
 	return &rides, nil
+}
+
+func (s *RideService) UpdateRide(ctx context.Context, ride *models.Ride) error {
+	return s.DB.WithContext(ctx).Save(ride).Error
+}
+
+func (s *RideService) DeleteRide(ctx context.Context, id int) error {
+	var ride models.Ride
+	if err := s.DB.WithContext(ctx).First(&ride, id).Error; err != nil {
+		return err
+	}
+
+	return s.DB.WithContext(ctx).Delete(&ride).Error
 }

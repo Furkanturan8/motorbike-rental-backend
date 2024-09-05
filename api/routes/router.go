@@ -72,7 +72,9 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Get(adminRoutes, "/rides", rideHandler.GetAllRides)
 	router.Get(adminRoutes, "/rides/:id", rideHandler.GetRideByID)
 	router.Post(adminRoutes, "/ride", rideHandler.CreateRide)
-	router.Get(adminRoutes, "/rides/user/:userID", rideHandler.GetRidesByUserID)
+	router.Get(adminRoutes, "/rides/user/:userID", rideHandler.GetRidesByUserID) // Belirli bir kullanıcıya ait tüm kiralamaları getirme
 	router.Get(adminRoutes, "/users/:userID/rides/:rideID", rideHandler.GetRideByUserID)
 	router.Get(adminRoutes, "/motorbike/:bikeID/rides", rideHandler.GetRidesByBikeID)
+	router.Put(adminRoutes, "/ride/update/:id", rideHandler.UpdateRideByID)
+	router.Delete(adminRoutes, "/ride/:id", rideHandler.DeleteRide)
 }

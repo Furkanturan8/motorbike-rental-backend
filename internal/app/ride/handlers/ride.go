@@ -150,3 +150,49 @@ func (h RideHandler) GetRidesByBikeID(ctx *app.Ctx) error {
 
 	return ctx.SuccessResponse(rideDetails, len(rideDetails))
 }
+
+func (h RideHandler) UpdateRideByID(ctx *app.Ctx) error {
+	var rideUpdateVM viewmodels.RideUpdateVM
+	if err := ctx.BodyParser(&rideUpdateVM); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz istek!"})
+	}
+
+	param := ctx.Params("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Hatalı istek!"})
+	}
+
+	ride, err := h.rideService.GetRideByID(ctx.Context(), id)
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Sürüş bulunamadı!"})
+	}
+
+	updatedRide := rideUpdateVM.ToDBModel(*ride)
+	if err := h.rideService.UpdateRide(ctx.Context(), &updatedRide); err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Sürüş güncellenirken bir hata oluştu!"})
+	}
+
+	var vm viewmodels.RideDetailVM
+	rideDetail := vm.ToDBModel(updatedRide)
+
+	return ctx.SuccessResponse(rideDetail, 1)
+}
+
+func (h RideHandler) DeleteRide(ctx *app.Ctx) error {
+	param := ctx.Params("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Hatalı istek!"})
+	}
+
+	err = h.rideService.DeleteRide(ctx.Context(), id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Sürüş bulunamadı!"})
+		}
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Sürüş silinirken hata oluştu!"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Sürüş başarıyla silindi!"})
+}
