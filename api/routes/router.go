@@ -1,12 +1,12 @@
 package routes
 
 import (
-	motor_Handler "motorbike-rental-backend/internal/app/motorbike/handlers"
-	motor_Service "motorbike-rental-backend/internal/app/motorbike/services"
-	ride_Handler "motorbike-rental-backend/internal/app/ride/handlers"
-	ride_Service "motorbike-rental-backend/internal/app/ride/services"
-	"motorbike-rental-backend/internal/app/user-and-auth/handlers"
-	"motorbike-rental-backend/internal/app/user-and-auth/services"
+	_motorHandler "motorbike-rental-backend/internal/app/motorbike/handlers"
+	_motorService "motorbike-rental-backend/internal/app/motorbike/services"
+	_rideHandler "motorbike-rental-backend/internal/app/ride/handlers"
+	_rideService "motorbike-rental-backend/internal/app/ride/services"
+	_baseHandler "motorbike-rental-backend/internal/app/user-and-auth/handlers"
+	_baseService "motorbike-rental-backend/internal/app/user-and-auth/services"
 	"motorbike-rental-backend/pkg/app"
 	"motorbike-rental-backend/pkg/router"
 	"time"
@@ -20,17 +20,17 @@ func NewIdareRouter() *IdareRouter {
 }
 
 func (IdareRouter) RegisterRoutes(app *app.App) {
-	userService := services.NewUserService(app.DB)
-	userHandler := handlers.NewUserHandler(userService)
+	userService := _baseService.NewUserService(app.DB)
+	userHandler := _baseHandler.NewUserHandler(userService)
 
-	authService := services.NewAuthService(app.DB, app.Cfg.Server.JwtSecret, app.Cfg.Server.JwtAccessTokenExpireMinute*time.Minute, app.Cfg.Server.JwtRefreshTokenExpireHour*time.Hour)
-	authHandler := handlers.NewAuthHandler(authService, userService)
+	authService := _baseService.NewAuthService(app.DB, app.Cfg.Server.JwtSecret, app.Cfg.Server.JwtAccessTokenExpireMinute*time.Minute, app.Cfg.Server.JwtRefreshTokenExpireHour*time.Hour)
+	authHandler := _baseHandler.NewAuthHandler(authService, userService)
 
-	motorService := motor_Service.NewMotorService(app.DB)
-	motorHandler := motor_Handler.NewMotorHandler(motorService)
+	motorService := _motorService.NewMotorService(app.DB)
+	motorHandler := _motorHandler.NewMotorHandler(motorService)
 
-	rideService := ride_Service.NewRideService(app.DB)
-	rideHandler := ride_Handler.NewRideHandler(rideService)
+	rideService := _rideService.NewRideService(app.DB)
+	rideHandler := _rideHandler.NewRideHandler(rideService)
 
 	api := app.FiberApp.Group("/api")
 
