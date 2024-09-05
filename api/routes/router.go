@@ -77,4 +77,6 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Get(adminRoutes, "/motorbike/:bikeID/rides", rideHandler.GetRidesByBikeID)
 	router.Put(adminRoutes, "/ride/update/:id", rideHandler.UpdateRideByID)
 	router.Delete(adminRoutes, "/ride/:id", rideHandler.DeleteRide)
+	router.Get(adminRoutes, "/filtered-rides", rideHandler.GetRidesByDateRange)              // belirli tarih aralıklarındaki sürüşleri getirir -> /filtered-rides?start_time=2024-09-04&end_time=2024-09-05
+	router.Get(adminRoutes, "/rides/user/:userID/filter", rideHandler.GetRidesByUserAndDate) // userID ye göre belirli tarihler arasında getirir -> /rides/user/:userID/filter?start_time=2024-09-01&end_time=2024-09-09
 }

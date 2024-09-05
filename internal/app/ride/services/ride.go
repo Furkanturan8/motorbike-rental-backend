@@ -6,6 +6,7 @@ import (
 	modelBike "motorbike-rental-backend/internal/app/motorbike/models"
 	"motorbike-rental-backend/internal/app/ride/models"
 	modelUser "motorbike-rental-backend/internal/app/user-and-auth/models"
+	"time"
 )
 
 type IRideService interface {
@@ -17,6 +18,7 @@ type IRideService interface {
 	GetRidesByBikeID(ctx context.Context, bikeID int) (*[]models.Ride, error)
 	UpdateRide(ctx context.Context, ride *models.Ride) error
 	DeleteRide(ctx context.Context, id int) error
+	GetRidesByDateRange(ctx context.Context, startTime, endTime time.Time) (*[]models.Ride, error)
 }
 
 type RideService struct {
@@ -103,4 +105,17 @@ func (s *RideService) DeleteRide(ctx context.Context, id int) error {
 	}
 
 	return s.DB.WithContext(ctx).Delete(&ride).Error
+}
+
+func (s *RideService) GetRidesByDateRange(ctx context.Context, startTime, endTime time.Time) (*[]models.Ride, error) {
+	var rides []models.Ride
+
+	// Tarih aralığına göre filtreleme yapar
+	if err := s.DB.WithContext(ctx).
+		Where("start_time >= ? AND end_time <= ? AND end_time IS NOT NULL", startTime, endTime).
+		Find(&rides).Error; err != nil {
+		return nil, err
+	}
+
+	return &rides, nil
 }
