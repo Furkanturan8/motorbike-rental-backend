@@ -12,3 +12,5 @@ DROP TABLE IF EXISTS motorbike;
 DROP TABLE IF EXISTS motorbike_photos;
 
 DROP TABLE IF EXISTS rides;
+
+DROP TABLE IF EXISTS maps;

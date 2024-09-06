@@ -1,6 +1,8 @@
 package routes
 
 import (
+	_mapHandler "motorbike-rental-backend/internal/app/map/handlers"
+	_mapService "motorbike-rental-backend/internal/app/map/services"
 	_motorHandler "motorbike-rental-backend/internal/app/motorbike/handlers"
 	_motorService "motorbike-rental-backend/internal/app/motorbike/services"
 	_rideHandler "motorbike-rental-backend/internal/app/ride/handlers"
@@ -31,6 +33,9 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 
 	rideService := _rideService.NewRideService(app.DB)
 	rideHandler := _rideHandler.NewRideHandler(rideService)
+
+	mapService := _mapService.NewMapService(app.DB)
+	mapHandler := _mapHandler.NewMapHandler(mapService)
 
 	api := app.FiberApp.Group("/api")
 
@@ -79,4 +84,7 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Delete(adminRoutes, "/ride/:id", rideHandler.DeleteRide)
 	router.Get(adminRoutes, "/filtered-rides", rideHandler.GetRidesByDateRange)              // belirli tarih aralıklarındaki sürüşleri getirir -> /filtered-rides?start_time=2024-09-04&end_time=2024-09-05
 	router.Get(adminRoutes, "/rides/user/:userID/filter", rideHandler.GetRidesByUserAndDate) // userID ye göre belirli tarihler arasında getirir -> /rides/user/:userID/filter?start_time=2024-09-01&end_time=2024-09-09
+
+	// map operations
+	router.Get(adminRoutes, "/maps", mapHandler.GetAllMaps)
 }

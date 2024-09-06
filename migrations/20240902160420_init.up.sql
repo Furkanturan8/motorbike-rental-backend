@@ -66,6 +66,23 @@ CREATE TABLE IF NOT EXISTS rides (
 CREATE INDEX idx_rides_user_id ON rides(user_id);
 CREATE INDEX idx_rides_motorbike_id ON rides(motorbike_id);
 
+CREATE TABLE maps (
+  id SERIAL PRIMARY KEY,                            -- BaseModel'deki ID varsayılan olarak auto increment yapılır
+  motorbike_id INT NOT NULL,                        -- MotorbikeID
+  name VARCHAR(255) NOT NULL,                       -- Name
+  description TEXT,                                 -- Description
+  location_latitude DOUBLE PRECISION NOT NULL,      -- LocationLatitude
+  location_longitude DOUBLE PRECISION NOT NULL,     -- LocationLongitude
+  zoom_level INT DEFAULT 12,                        -- ZoomLevel, varsayılan olarak 12
+  map_type VARCHAR(50),                             -- MapType
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), -- BaseModel'deki oluşturulma tarihi
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), -- BaseModel'deki güncellenme tarihi
+  deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,   -- BaseModel'deki soft delete için kullanılacak alan
+  CONSTRAINT fk_motorbike
+      FOREIGN KEY (motorbike_id)
+          REFERENCES motorbike(id)                      -- Motorbike tablosuna foreign key
+);
+
 
 -- Insert default admin user
 DO $$
