@@ -87,4 +87,5 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 
 	// map operations
 	router.Get(adminRoutes, "/maps", mapHandler.GetAllMaps)
+	router.Get(adminRoutes, "/maps/:id", mapHandler.GetMapByID)
 }

@@ -1,10 +1,13 @@
 package handlers
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"errors"
+	"gorm.io/gorm"
 	mapService "motorbike-rental-backend/internal/app/map/services"
 	"motorbike-rental-backend/internal/app/map/viewmodels"
 	"motorbike-rental-backend/pkg/app"
+	"motorbike-rental-backend/pkg/errorsx"
+	"strconv"
 )
 
 type MapHandler struct {
@@ -18,7 +21,7 @@ func NewMapHandler(s mapService.IMapService) MapHandler {
 func (h MapHandler) GetAllMaps(ctx *app.Ctx) error {
 	maps, err := h.mapService.GetAllMaps(ctx.Context())
 	if err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Motorsiklet Konumları getirilemedi!"})
+		return errorsx.InternalError(err, "motorsiklet konumları getirilemedi!")
 	}
 
 	var mapDetails []viewmodels.MapDetailVM
@@ -30,4 +33,26 @@ func (h MapHandler) GetAllMaps(ctx *app.Ctx) error {
 	}
 
 	return ctx.SuccessResponse(mapDetails, len(mapDetails))
+}
+
+func (h MapHandler) GetMapByID(ctx *app.Ctx) error {
+	param := ctx.Params("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return errorsx.BadRequestError("Hatalı istek!")
+	}
+
+	data, err := h.mapService.GetMapByID(ctx.Context(), id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errorsx.NotFoundError("Bu adres bulunamadı!")
+		}
+		return errorsx.InternalError(err, "Bu adres getirilirken hata oluştu!")
+	}
+
+	var vm viewmodels.MapDetailVM
+
+	mapDetail := vm.ToDBModel(*data)
+
+	return ctx.SuccessResponse(mapDetail, 1)
 }

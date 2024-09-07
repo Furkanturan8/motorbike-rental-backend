@@ -51,6 +51,7 @@ func (vm *MapUpdateVM) ToDBModel(m models.Map) models.Map {
 }
 
 type MapDetailVM struct {
+	ID                uint                    `json:"id"`
 	MotorbikeID       uint                    `json:"motorbike_id"`
 	Name              string                  `json:"name"`
 	Description       string                  `json:"description"`
@@ -63,6 +64,7 @@ type MapDetailVM struct {
 
 func (vm *MapDetailVM) ToDBModel(m models.Map) MapDetailVM {
 	return MapDetailVM{
+		ID:                uint(m.ID),
 		MotorbikeID:       m.MotorbikeID,
 		Name:              m.Name,
 		Description:       m.Description,

@@ -8,6 +8,7 @@ import (
 	rideService "motorbike-rental-backend/internal/app/ride/services"
 	"motorbike-rental-backend/internal/app/ride/viewmodels"
 	"motorbike-rental-backend/pkg/app"
+	"motorbike-rental-backend/pkg/errorsx"
 	"strconv"
 	"time"
 )
@@ -47,7 +48,7 @@ func (h RideHandler) GetRideByID(ctx *app.Ctx) error {
 	data, err := h.rideService.GetRideByID(ctx.Context(), id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Sürüş bulunamadı!"})
+			return errorsx.NotFoundError("Sürüş bulunamadı!")
 		}
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Sürüş detayları getirilirken hata oluştu!"})
 	}

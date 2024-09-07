@@ -8,6 +8,7 @@ import (
 
 type IMapService interface {
 	GetAllMaps(ctx context.Context) (*[]models.Map, error)
+	GetMapByID(ctx context.Context, id int) (*models.Map, error)
 }
 
 type MapService struct {
@@ -21,9 +22,18 @@ func NewMapService(db *gorm.DB) IMapService {
 func (s *MapService) GetAllMaps(ctx context.Context) (*[]models.Map, error) {
 	var maps []models.Map
 
-	if err := s.DB.WithContext(ctx).Find(&maps).Error; err != nil {
+	if err := s.DB.WithContext(ctx).Preload("Motorbike").Preload("Motorbike.Photos").Find(&maps).Error; err != nil {
 		return nil, err
 	}
 
 	return &maps, nil
+}
+
+func (s *MapService) GetMapByID(ctx context.Context, id int) (*models.Map, error) {
+	var _map models.Map
+
+	if err := s.DB.WithContext(ctx).Preload("Motorbike").Preload("Motorbike.Photos").Where("id = ?", id).First(&_map).Error; err != nil {
+		return nil, err
+	}
+	return &_map, nil
 }
