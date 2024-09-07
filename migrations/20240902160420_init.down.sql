@@ -14,3 +14,5 @@ DROP TABLE IF EXISTS motorbike_photos;
 DROP TABLE IF EXISTS rides;
 
 DROP TABLE IF EXISTS maps;
+
+DROP TABLE IF EXISTS bluetooth_connection;

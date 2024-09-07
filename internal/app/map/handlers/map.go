@@ -31,7 +31,7 @@ func (h MapHandler) GetAllMaps(ctx *app.Ctx) error {
 
 	for _, _map := range *maps {
 		vm := viewmodels.MapDetailVM{}
-		mapDetail := vm.ToDBModel(_map)
+		mapDetail := vm.ToViewModel(_map)
 		mapDetails = append(mapDetails, mapDetail)
 	}
 
@@ -55,7 +55,7 @@ func (h MapHandler) GetMapByID(ctx *app.Ctx) error {
 
 	var vm viewmodels.MapDetailVM
 
-	mapDetail := vm.ToDBModel(*data)
+	mapDetail := vm.ToViewModel(*data)
 
 	return ctx.SuccessResponse(mapDetail, 1)
 }
@@ -81,7 +81,7 @@ func (h MapHandler) GetMapByMotorID(ctx *app.Ctx) error {
 	}
 
 	vm := viewmodels.MapDetailVM{}
-	mapDetail := vm.ToDBModel(*data)
+	mapDetail := vm.ToViewModel(*data)
 
 	return ctx.SuccessResponse(mapDetail, 1)
 }

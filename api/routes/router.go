@@ -1,6 +1,8 @@
 package routes
 
 import (
+	_connHandler "motorbike-rental-backend/internal/app/bluetooth-connection/handlers"
+	_connService "motorbike-rental-backend/internal/app/bluetooth-connection/services"
 	_mapHandler "motorbike-rental-backend/internal/app/map/handlers"
 	_mapService "motorbike-rental-backend/internal/app/map/services"
 	_motorHandler "motorbike-rental-backend/internal/app/motorbike/handlers"
@@ -36,6 +38,9 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 
 	mapService := _mapService.NewMapService(app.DB)
 	mapHandler := _mapHandler.NewMapHandler(mapService, motorService)
+
+	connService := _connService.NewConnService(app.DB)
+	connHandler := _connHandler.NewConnHandler(connService)
 
 	api := app.FiberApp.Group("/api")
 
@@ -93,4 +98,7 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Get(adminRoutes, "/motorbikes/:motorbikeID/map", mapHandler.GetMapByMotorID)
 	router.Put(adminRoutes, "/map/update/:id", mapHandler.UpdateMap)
 	router.Put(adminRoutes, "/motorbikes/:motorbikeID/map/update", mapHandler.UpdateMapByMotorID)
+
+	// bluetooth connection operations
+	router.Get(adminRoutes, "/connections", connHandler.GetAllConnections)
 }

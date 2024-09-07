@@ -31,7 +31,7 @@ func (h RideHandler) GetAllRides(ctx *app.Ctx) error {
 
 	for _, ride := range *rides {
 		vm := viewmodels.RideDetailVM{}
-		rideDetail := vm.ToDBModel(ride)
+		rideDetail := vm.ToViewModel(ride)
 		rideDetails = append(rideDetails, rideDetail)
 	}
 
@@ -54,7 +54,7 @@ func (h RideHandler) GetRideByID(ctx *app.Ctx) error {
 	}
 
 	var vm viewmodels.RideDetailVM
-	rideDetail := vm.ToDBModel(*data)
+	rideDetail := vm.ToViewModel(*data)
 
 	return ctx.SuccessResponse(rideDetail, 1)
 }
@@ -94,7 +94,7 @@ func (h RideHandler) GetRidesByUserID(ctx *app.Ctx) error {
 
 	for _, ride := range *rides {
 		vm := viewmodels.RideDetailVM{}
-		rideDetail := vm.ToDBModel(ride)
+		rideDetail := vm.ToViewModel(ride)
 		rideDetails = append(rideDetails, rideDetail)
 	}
 
@@ -123,7 +123,7 @@ func (h RideHandler) GetRideByUserID(ctx *app.Ctx) error {
 	}
 
 	var vm viewmodels.RideDetailVM
-	rideDetail := vm.ToDBModel(*ride)
+	rideDetail := vm.ToViewModel(*ride)
 
 	return ctx.SuccessResponse(rideDetail, 1) // pkg/errorsx.go sınıfından
 }
@@ -147,7 +147,7 @@ func (h RideHandler) GetRidesByBikeID(ctx *app.Ctx) error {
 
 	for _, ride := range *rides {
 		vm := viewmodels.RideDetailVM{}
-		rideDetail := vm.ToDBModel(ride)
+		rideDetail := vm.ToViewModel(ride)
 		rideDetails = append(rideDetails, rideDetail)
 	}
 
@@ -231,7 +231,7 @@ func (h RideHandler) GetRidesByDateRange(ctx *app.Ctx) error {
 
 	for _, ride := range *rides {
 		vm := viewmodels.RideDetailVM{}
-		rideDetail := vm.ToDBModel(ride)
+		rideDetail := vm.ToViewModel(ride)
 		ridesDetails = append(ridesDetails, rideDetail)
 	}
 
@@ -282,7 +282,7 @@ func (h RideHandler) GetRidesByUserAndDate(ctx *app.Ctx) error {
 	var rideDetails []viewmodels.RideDetailVM
 	for _, ride := range filteredRides {
 		vm := viewmodels.RideDetailVM{}
-		rideDetail := vm.ToDBModel(ride)
+		rideDetail := vm.ToViewModel(ride)
 		rideDetails = append(rideDetails, rideDetail)
 	}
 

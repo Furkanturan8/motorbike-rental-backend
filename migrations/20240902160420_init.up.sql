@@ -83,6 +83,21 @@ CREATE TABLE maps (
           REFERENCES motorbike(id)                      -- Motorbike tablosuna foreign key
 );
 
+CREATE TABLE bluetooth_connection (
+ id SERIAL PRIMARY KEY,                     -- Otomatik artan birincil anahtar
+ user_id INTEGER NOT NULL,                  -- User ID, foreign key olacak
+ motorbike_id INTEGER NOT NULL,             -- Motorbike ID, foreign key olacak
+ connected_at TIMESTAMPTZ NOT NULL,         -- Bağlantının gerçekleştiği zaman
+ disconnected_at TIMESTAMPTZ,               -- Bağlantının kesildiği zaman (opsiyonel)
+ created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- Kaydın oluşturulduğu zaman
+ updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),  -- Kaydın güncellendiği zaman
+ deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+-- Foreign key tanımlamaları
+ CONSTRAINT fk_user
+     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+ CONSTRAINT fk_motorbike
+     FOREIGN KEY(motorbike_id) REFERENCES motorbike(id) ON DELETE CASCADE
+);
 
 -- Insert default admin user
 DO $$

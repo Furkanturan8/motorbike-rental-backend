@@ -14,3 +14,7 @@ type Map struct {
 
 	Motorbike models.Motorbike `gorm:"foreignKey:MotorbikeID" json:"motorbike"`
 }
+
+func (Map) TableName() string {
+	return "maps"
+}

@@ -61,7 +61,7 @@ type MapDetailVM struct {
 	MotorBike         viewmodels.BikeDetailVM `json:"motorbike"`
 }
 
-func (vm *MapDetailVM) ToDBModel(m models.Map) MapDetailVM {
+func (vm *MapDetailVM) ToViewModel(m models.Map) MapDetailVM {
 	return MapDetailVM{
 		ID:                uint(m.ID),
 		MotorbikeID:       m.MotorbikeID,

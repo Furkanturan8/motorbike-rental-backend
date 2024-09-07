@@ -57,7 +57,7 @@ type RideDetailVM struct {
 	Cost        float64    `json:"cost"`
 }
 
-func (vm *RideDetailVM) ToDBModel(ride models.Ride) RideDetailVM {
+func (vm *RideDetailVM) ToViewModel(ride models.Ride) RideDetailVM {
 	return RideDetailVM{
 		ID:          uint(ride.ID),
 		UserID:      ride.UserID,
