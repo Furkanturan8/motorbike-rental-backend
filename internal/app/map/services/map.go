@@ -12,6 +12,7 @@ type IMapService interface {
 	CreateMap(ctx context.Context, _map *models.Map) error
 	DeleteMap(ctx context.Context, id int) error
 	GetMapByMotorbikeID(ctx context.Context, motorbikeID int) (*models.Map, error)
+	UpdateMap(ctx context.Context, updatedMap *models.Map) error
 }
 
 type MapService struct {
@@ -61,4 +62,8 @@ func (s *MapService) GetMapByMotorbikeID(ctx context.Context, motorbikeID int) (
 		return nil, err
 	}
 	return &_map, nil
+}
+
+func (s *MapService) UpdateMap(ctx context.Context, updatedMap *models.Map) error {
+	return s.DB.WithContext(ctx).Save(updatedMap).Error
 }

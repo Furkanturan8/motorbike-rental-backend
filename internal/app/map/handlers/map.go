@@ -60,7 +60,7 @@ func (h MapHandler) GetMapByID(ctx *app.Ctx) error {
 	return ctx.SuccessResponse(mapDetail, 1)
 }
 
-func (h MapHandler) GetMapByMotorbikeID(ctx *app.Ctx) error {
+func (h MapHandler) GetMapByMotorID(ctx *app.Ctx) error {
 	param := ctx.Params("motorbikeID")
 	id, err := strconv.Atoi(param)
 	if err != nil {
@@ -109,7 +109,7 @@ func (h MapHandler) CreateMap(ctx *app.Ctx) error {
 		if errorsx.Is(err, gorm.ErrRecordNotFound) {
 			return errorsx.NotFoundError("Böyle bir motorsiklet zaten yok! Var olan motoru seçiniz, veya yeni bir motor oluşturun!")
 		}
-		return errorsx.BadRequestError("Hatalı istek!")
+		return errorsx.InternalError(err, "Motorsiklet sorgulama sırasında bir hata oluştu!")
 	}
 
 	if err := h.mapService.CreateMap(ctx.Context(), &_map); err != nil {
@@ -134,4 +134,68 @@ func (h MapHandler) DeleteMap(ctx *app.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Adres başarılı bir şekilde silindi!"})
+}
+
+func (h MapHandler) UpdateMap(ctx *app.Ctx) error {
+	var mapUpdateVM viewmodels.MapUpdateVM
+	if err := ctx.BodyParser(&mapUpdateVM); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz istek."})
+	}
+
+	param := ctx.Params("id")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return errorsx.BadRequestError("Hatalı istek!")
+	}
+
+	data, err := h.mapService.GetMapByID(ctx.Context(), id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errorsx.NotFoundError("Bu adres bulunamadı!")
+		}
+		return errorsx.InternalError(err, "Bu adres getirilirken hata oluştu!")
+	}
+
+	updatedMap := mapUpdateVM.ToDBModel(*data)
+	if err = h.mapService.UpdateMap(ctx.Context(), &updatedMap); err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Adres güncellenirken bir hata oluştu!"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Adres güncellendi!"})
+}
+
+func (h MapHandler) UpdateMapByMotorID(ctx *app.Ctx) error {
+	var mapUpdateVM viewmodels.MapUpdateVM
+	if err := ctx.BodyParser(&mapUpdateVM); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz istek."})
+	}
+
+	param := ctx.Params("motorbikeID")
+	motorbikeID, err := strconv.Atoi(param)
+	if err != nil {
+		return errorsx.BadRequestError("Hatalı istek!")
+	}
+
+	_, err = h.bikeService.GetMotorByID(ctx.Context(), motorbikeID)
+	if err != nil {
+		if errorsx.Is(err, gorm.ErrRecordNotFound) {
+			return errorsx.NotFoundError("Böyle bir motorsiklet zaten yok! Var olan motoru seçiniz!")
+		}
+		return errorsx.InternalError(err, "Motorsiklet sorgulama sırasında bir hata oluştu!")
+	}
+
+	data, err := h.mapService.GetMapByMotorbikeID(ctx.Context(), motorbikeID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errorsx.NotFoundError("Bu adres bulunamadı!")
+		}
+		return errorsx.InternalError(err, "Bu adres getirilirken hata oluştu!")
+	}
+
+	updatedMap := mapUpdateVM.ToDBModel(*data)
+	if err = h.mapService.UpdateMap(ctx.Context(), &updatedMap); err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Adres güncellenirken bir hata oluştu!"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Adres güncellendi!"})
 }

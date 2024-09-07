@@ -58,7 +58,7 @@ func (h MotorHandler) UpdateMotor(ctx *app.Ctx) error {
 
 	// Güncelleme verilerini motor modeline uygula
 	updatedMotorbike := bikeUpdateVM.ToDBModel(*motorbike)
-	if err := h.bikeService.UpdateMotor(ctx.Context(), &updatedMotorbike); err != nil {
+	if err = h.bikeService.UpdateMotor(ctx.Context(), &updatedMotorbike); err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Motor güncellenirken bir hata oluştu."})
 	}
 

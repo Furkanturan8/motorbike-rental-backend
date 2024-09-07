@@ -86,9 +86,11 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Get(adminRoutes, "/rides/user/:userID/filter", rideHandler.GetRidesByUserAndDate) // userID ye göre belirli tarihler arasında getirir -> /rides/user/:userID/filter?start_time=2024-09-01&end_time=2024-09-09
 
 	// map operations
-	router.Get(adminRoutes, "/maps", mapHandler.GetAllMaps)
-	router.Get(adminRoutes, "/maps/:id", mapHandler.GetMapByID)
 	router.Post(adminRoutes, "/map", mapHandler.CreateMap)
 	router.Delete(adminRoutes, "/map/:id", mapHandler.DeleteMap)
-	router.Get(adminRoutes, "/motorbikes/:motorbikeID/map", mapHandler.GetMapByMotorbikeID)
+	router.Get(adminRoutes, "/maps", mapHandler.GetAllMaps)
+	router.Get(adminRoutes, "/maps/:id", mapHandler.GetMapByID)
+	router.Get(adminRoutes, "/motorbikes/:motorbikeID/map", mapHandler.GetMapByMotorID)
+	router.Put(adminRoutes, "/map/update/:id", mapHandler.UpdateMap)
+	router.Put(adminRoutes, "/motorbikes/:motorbikeID/map/update", mapHandler.UpdateMapByMotorID)
 }
