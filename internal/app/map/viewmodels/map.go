@@ -13,7 +13,6 @@ type MapCreateVM struct {
 	LocationLongitude float64 `json:"longitude" validate:"required,gte=-180,lte=180"` // Boylam -180 ile 180 arasında olmalı
 	ZoomLevel         int     `json:"zoom_level" validate:"gte=1,lte=20"`             // Yakınlaştırma seviyesi 1-20 arası olmalı
 	MapType           string  `json:"map_type" validate:"required"`                   // Harita türü belirtilmeli (sınırlı değerler)
-
 }
 
 func (vm *MapCreateVM) ToDBModel() models.Map {

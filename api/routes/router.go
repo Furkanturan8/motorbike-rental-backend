@@ -35,7 +35,7 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	rideHandler := _rideHandler.NewRideHandler(rideService)
 
 	mapService := _mapService.NewMapService(app.DB)
-	mapHandler := _mapHandler.NewMapHandler(mapService)
+	mapHandler := _mapHandler.NewMapHandler(mapService, motorService)
 
 	api := app.FiberApp.Group("/api")
 
@@ -88,4 +88,7 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	// map operations
 	router.Get(adminRoutes, "/maps", mapHandler.GetAllMaps)
 	router.Get(adminRoutes, "/maps/:id", mapHandler.GetMapByID)
+	router.Post(adminRoutes, "/map", mapHandler.CreateMap)
+	router.Delete(adminRoutes, "/map/:id", mapHandler.DeleteMap)
+	router.Get(adminRoutes, "/motorbikes/:motorbikeID/map", mapHandler.GetMapByMotorbikeID)
 }
