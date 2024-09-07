@@ -40,7 +40,7 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	mapHandler := _mapHandler.NewMapHandler(mapService, motorService)
 
 	connService := _connService.NewConnService(app.DB)
-	connHandler := _connHandler.NewConnHandler(connService)
+	connHandler := _connHandler.NewConnHandler(connService, motorService)
 
 	api := app.FiberApp.Group("/api")
 
@@ -101,4 +101,10 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 
 	// bluetooth connection operations
 	router.Get(adminRoutes, "/connections", connHandler.GetAllConnections)
+	router.Get(adminRoutes, "/connections/:id", connHandler.GetConnByID)
+	router.Post(adminRoutes, "/connection", connHandler.CreateConn)
+	//router.Delete(adminRoutes, "/connection/:id", connHandler.DeleteConn)
+	//router.Get(adminRoutes, "/connection/:motorbikeID", connHandler.GetConnByMotorID)
+	//router.Get(adminRoutes, "/connection/:userID", connHandler.GetConnByUserID)
+
 }

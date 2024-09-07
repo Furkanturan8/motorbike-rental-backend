@@ -8,6 +8,8 @@ import (
 
 type IConnService interface {
 	GetAllConnections(ctx context.Context) (*[]models.BluetoothConnection, error)
+	GetConnByID(ctx context.Context, id int) (*models.BluetoothConnection, error)
+	CreateConn(ctx context.Context, conn *models.BluetoothConnection) error
 }
 
 type ConnService struct {
@@ -20,9 +22,23 @@ func NewConnService(db *gorm.DB) IConnService {
 
 func (s *ConnService) GetAllConnections(ctx context.Context) (*[]models.BluetoothConnection, error) {
 	var connections []models.BluetoothConnection
-	if err := s.DB.WithContext(ctx).Preload("User").Preload("Motorbike").Find(&connections).Error; err != nil {
+	if err := s.DB.WithContext(ctx).Preload("User").Preload("Motorbike").Preload("Motorbike.Photos").Find(&connections).Error; err != nil {
 		return nil, err
 	}
 
 	return &connections, nil
+}
+
+func (s *ConnService) GetConnByID(ctx context.Context, id int) (*models.BluetoothConnection, error) {
+	var connection models.BluetoothConnection
+
+	if err := s.DB.WithContext(ctx).Where("id=?", id).Preload("User").Preload("Motorbike").Preload("Motorbike.Photos").First(&connection).Error; err != nil {
+		return nil, err
+	}
+
+	return &connection, nil
+}
+
+func (s *ConnService) CreateConn(ctx context.Context, conn *models.BluetoothConnection) error {
+	return s.DB.WithContext(ctx).Create(conn).Error
 }
