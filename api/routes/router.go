@@ -103,11 +103,10 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 
 	// bluetooth connection operations
 	router.Get(adminRoutes, "/connections", connHandler.GetAllConnections)
-	router.Get(adminRoutes, "/connections/:id", connHandler.GetConnByID)
+	router.Get(adminRoutes, "/connection/:id", connHandler.GetConnByID)
 	router.Post(adminRoutes, "/connection/connect", connHandler.Connect)           // connect
 	router.Post(adminRoutes, "/connection/disconnect/:id", connHandler.Disconnect) // disconnect
 	router.Delete(adminRoutes, "/connection/:id", connHandler.DeleteConn)
-	//router.Get(adminRoutes, "/connection/:motorbikeID", connHandler.GetConnByMotorID)
-	//router.Get(adminRoutes, "/connection/:userID", connHandler.GetConnByUserID)
-
+	router.Get(adminRoutes, "/connection/motorbike/:motorbikeID", connHandler.GetConnByMotorID)
+	router.Get(adminRoutes, "/connection/user/:userID", connHandler.GetConnByUserID)
 }

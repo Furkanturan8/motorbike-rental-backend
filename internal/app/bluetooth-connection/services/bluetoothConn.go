@@ -8,7 +8,7 @@ import (
 
 type IConnService interface {
 	GetAllConnections(ctx context.Context) (*[]models.BluetoothConnection, error)
-	GetConnByID(ctx context.Context, id int) (*models.BluetoothConnection, error)
+	GetConnByParam(ctx context.Context, paramName string, paramValue int) (*models.BluetoothConnection, error)
 	CreateConn(ctx context.Context, conn *models.BluetoothConnection) error
 	DeleteConn(ctx context.Context, id int) error
 	UpdateConn(ctx context.Context, connection *models.BluetoothConnection) error
@@ -31,16 +31,6 @@ func (s *ConnService) GetAllConnections(ctx context.Context) (*[]models.Bluetoot
 	return &connections, nil
 }
 
-func (s *ConnService) GetConnByID(ctx context.Context, id int) (*models.BluetoothConnection, error) {
-	var connection models.BluetoothConnection
-
-	if err := s.DB.WithContext(ctx).Where("id=?", id).Preload("User").Preload("Motorbike").Preload("Motorbike.Photos").First(&connection).Error; err != nil {
-		return nil, err
-	}
-
-	return &connection, nil
-}
-
 // Connect func from handler -> this func gonna create a new connection!
 func (s *ConnService) CreateConn(ctx context.Context, conn *models.BluetoothConnection) error {
 	return s.DB.WithContext(ctx).Create(conn).Error
@@ -59,4 +49,18 @@ func (s *ConnService) DeleteConn(ctx context.Context, id int) error {
 // Disconnect func from handler -> this func gonna disconnect a spesific connection!
 func (s *ConnService) UpdateConn(ctx context.Context, connection *models.BluetoothConnection) error {
 	return s.DB.WithContext(ctx).Save(connection).Error
+}
+
+func (s *ConnService) GetConnByParam(ctx context.Context, paramName string, paramValue int) (*models.BluetoothConnection, error) {
+	var connection models.BluetoothConnection
+
+	if err := s.DB.WithContext(ctx).Where(paramName+" = ?", paramValue).
+		Preload("User").
+		Preload("Motorbike").
+		Preload("Motorbike.Photos").
+		First(&connection).Error; err != nil {
+		return nil, err
+	}
+
+	return &connection, nil
 }

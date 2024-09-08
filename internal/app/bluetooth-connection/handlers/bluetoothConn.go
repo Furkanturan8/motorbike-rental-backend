@@ -9,6 +9,7 @@ import (
 	motorService "motorbike-rental-backend/internal/app/motorbike/services"
 	"motorbike-rental-backend/pkg/app"
 	"motorbike-rental-backend/pkg/errorsx"
+	"motorbike-rental-backend/pkg/utils"
 	"strconv"
 	"time"
 )
@@ -37,27 +38,6 @@ func (h ConnHandler) GetAllConnections(ctx *app.Ctx) error {
 	}
 
 	return ctx.SuccessResponse(connDetails, len(connDetails))
-}
-
-func (h ConnHandler) GetConnByID(ctx *app.Ctx) error {
-	param := ctx.Params("id")
-	id, err := strconv.Atoi(param)
-	if err != nil {
-		return errorsx.BadRequestError("Hatalı istek!")
-	}
-
-	data, err := h.connService.GetConnByID(ctx.Context(), id)
-	if err != nil {
-		if errorsx.Is(err, gorm.ErrRecordNotFound) {
-			return errorsx.NotFoundError("Böyle bir bağlantı yok!")
-		}
-		return errorsx.InternalError(err, "Bir hata oluştu!")
-	}
-
-	var vm viewmodels.BluetoothConnectionDetailVM
-	connDetail := vm.ToViewModel(*data)
-
-	return ctx.SuccessResponse(connDetail, 1)
 }
 
 // important logical thing : when i create a new connection, i need to check motorbikeID.
@@ -98,7 +78,7 @@ func (h ConnHandler) Disconnect(ctx *app.Ctx) error {
 		return errorsx.BadRequestError("Hatalı istek!")
 	}
 
-	connection, err := h.connService.GetConnByID(ctx.Context(), id)
+	connection, err := h.connService.GetConnByParam(ctx.Context(), "id", id)
 	if err != nil {
 		if errorsx.Is(err, gorm.ErrRecordNotFound) {
 			return errorsx.NotFoundError("Böyle bir bağlantı yok!")
@@ -150,3 +130,81 @@ func (h ConnHandler) DeleteConn(ctx *app.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Bağlantı başarılı bir şekilde silindi!"})
 }
+
+// motorbike id
+func (h ConnHandler) GetConnByMotorID(ctx *app.Ctx) error {
+	motorbikeID, err := utils.GetMyParamInt(ctx, "motorbikeID")
+	if err != nil {
+		return errorsx.BadRequestError("Hatalı istek!")
+	}
+
+	data, err := h.connService.GetConnByParam(ctx.Context(), "motorbike_id", motorbikeID)
+	if err != nil {
+		if errorsx.Is(err, gorm.ErrRecordNotFound) {
+			return errorsx.NotFoundError("Böyle bir bağlantı yok!")
+		}
+		return errorsx.InternalError(err, "Bir hata oluştu!")
+	}
+
+	var vm viewmodels.BluetoothConnectionDetailVM
+	connDetail := vm.ToViewModel(*data)
+
+	return ctx.SuccessResponse(connDetail, 1)
+
+}
+
+// connection id
+func (h ConnHandler) GetConnByID(ctx *app.Ctx) error {
+	id, err := utils.GetMyParamInt(ctx, "id")
+	if err != nil {
+		return errorsx.BadRequestError("Hatalı istek!")
+	}
+
+	data, err := h.connService.GetConnByParam(ctx.Context(), "id", id)
+	if err != nil {
+		if errorsx.Is(err, gorm.ErrRecordNotFound) {
+			return errorsx.NotFoundError("Böyle bir bağlantı yok!")
+		}
+		return errorsx.InternalError(err, "Bir hata oluştu!")
+	}
+
+	var vm viewmodels.BluetoothConnectionDetailVM
+	connDetail := vm.ToViewModel(*data)
+
+	return ctx.SuccessResponse(connDetail, 1)
+}
+
+// user id
+func (h ConnHandler) GetConnByUserID(ctx *app.Ctx) error {
+	userID, err := utils.GetMyParamInt(ctx, "userID")
+	if err != nil {
+		return errorsx.BadRequestError("Hatalı istek!")
+	}
+
+	data, err := h.connService.GetConnByParam(ctx.Context(), "user_id", userID)
+	if err != nil {
+		if errorsx.Is(err, gorm.ErrRecordNotFound) {
+			return errorsx.NotFoundError("Böyle bir bağlantı yok!")
+		}
+		return errorsx.InternalError(err, "Bir hata oluştu!")
+	}
+
+	var vm viewmodels.BluetoothConnectionDetailVM
+	connDetail := vm.ToViewModel(*data)
+
+	return ctx.SuccessResponse(connDetail, 1)
+}
+
+/*
+pkg/utils içerisinde :
+
+func GetMyParamInt(ctx *app.Ctx, paramValue string) (int, error) {
+	_param := ctx.Params(paramValue)
+	param, err := strconv.Atoi(_param)
+	if err != nil {
+		return -1, err
+	}
+	return param, nil
+}
+
+*/
