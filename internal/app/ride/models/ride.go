@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// todo : buraya ek olarak başlangıç ve bitiş noktası eklemeliyiz!
+// todo : buraya ek olarak başlangıç ve bitiş noktası/konumu eklemeliyiz!
 type Ride struct {
 	BaseModel
 	UserID      uint       `gorm:"not null"`
