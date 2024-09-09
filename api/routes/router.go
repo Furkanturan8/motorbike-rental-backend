@@ -34,7 +34,7 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	motorHandler := _motorHandler.NewMotorHandler(motorService)
 
 	rideService := _rideService.NewRideService(app.DB)
-	rideHandler := _rideHandler.NewRideHandler(rideService)
+	rideHandler := _rideHandler.NewRideHandler(rideService, motorService)
 
 	mapService := _mapService.NewMapService(app.DB)
 	mapHandler := _mapHandler.NewMapHandler(mapService, motorService)
@@ -89,6 +89,8 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Delete(adminRoutes, "/ride/:id", rideHandler.DeleteRide)
 	router.Get(adminRoutes, "/filtered-rides", rideHandler.GetRidesByDateRange)              // belirli tarih aralıklarındaki sürüşleri getirir -> /filtered-rides?start_time=2024-09-04&end_time=2024-09-05
 	router.Get(adminRoutes, "/rides/user/:userID/filter", rideHandler.GetRidesByUserAndDate) // userID ye göre belirli tarihler arasında getirir -> /rides/user/:userID/filter?start_time=2024-09-01&end_time=2024-09-09
+	router.Put(adminRoutes, "/ride/finish/:id", rideHandler.FinishRide)
+
 	// todo-1 : sürüşü bitir fonksiyonu ekle! UpdateRide ile yapmak güvenlik açığına neden olabilir. UpdateRide sadece admin için kullanılacak!
 	// todo-2 : user, sürüşü bitirince kilitledikten sonra fotoğraflarını ekleyecek. Bunun için bir fotoğraf ekleme fonksiyonu yazılacak! Onaylanırsa yani gerçekten kitlenirse Disconnect fonksiyonunu çağıracak ve bağlantıyı koparacak! Şimdilik senaryo bu şekilde ilerleyen zamanlarda bakarız!
 

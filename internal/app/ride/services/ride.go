@@ -31,7 +31,7 @@ func NewRideService(db *gorm.DB) IRideService {
 
 func (s *RideService) GetAllRides(ctx context.Context) (*[]models.Ride, error) {
 	var rides []models.Ride
-	if err := s.DB.WithContext(ctx).Find(&rides).Error; err != nil {
+	if err := s.DB.WithContext(ctx).Preload("User").Preload("Motorbike").Preload("Motorbike.Photos").Find(&rides).Error; err != nil {
 		return nil, err
 	}
 
@@ -41,7 +41,7 @@ func (s *RideService) GetAllRides(ctx context.Context) (*[]models.Ride, error) {
 func (s *RideService) GetRideByID(ctx context.Context, id int) (*models.Ride, error) {
 	var ride models.Ride
 
-	if err := s.DB.WithContext(ctx).Where("id = ?", id).First(&ride).Error; err != nil {
+	if err := s.DB.WithContext(ctx).Preload("User").Preload("Motorbike").Preload("Motorbike.Photos").Where("id = ?", id).First(&ride).Error; err != nil {
 		return nil, err
 	}
 	return &ride, nil
@@ -59,7 +59,7 @@ func (s *RideService) GetRidesByUserID(ctx context.Context, userID int) (*[]mode
 		return nil, err
 	}
 
-	if err := s.DB.WithContext(ctx).Where("user_id = ?", userID).Find(&rides).Error; err != nil {
+	if err := s.DB.WithContext(ctx).Preload("User").Preload("Motorbike").Preload("Motorbike.Photos").Where("user_id = ?", userID).Find(&rides).Error; err != nil {
 		return nil, err
 	}
 	return &rides, nil
@@ -73,7 +73,7 @@ func (s *RideService) GetRideByUserID(ctx context.Context, userID int, rideID in
 		return nil, err
 	}
 
-	if err := s.DB.WithContext(ctx).Where("user_id = ? AND id = ?", userID, rideID).First(&ride).Error; err != nil {
+	if err := s.DB.WithContext(ctx).Preload("User").Preload("Motorbike").Preload("Motorbike.Photos").Where("user_id = ? AND id = ?", userID, rideID).First(&ride).Error; err != nil {
 		return nil, err
 	}
 	return &ride, nil
@@ -87,7 +87,7 @@ func (s *RideService) GetRidesByBikeID(ctx context.Context, bikeID int) (*[]mode
 		return nil, err
 	}
 
-	if err := s.DB.WithContext(ctx).Where("motorbike_id = ?", bikeID).Find(&rides).Error; err != nil {
+	if err := s.DB.WithContext(ctx).Preload("User").Preload("Motorbike").Preload("Motorbike.Photos").Where("motorbike_id = ?", bikeID).Find(&rides).Error; err != nil {
 		return nil, err
 	}
 
@@ -111,7 +111,7 @@ func (s *RideService) GetRidesByDateRange(ctx context.Context, startTime, endTim
 	var rides []models.Ride
 
 	// Tarih aralığına göre filtreleme yapar
-	if err := s.DB.WithContext(ctx).
+	if err := s.DB.WithContext(ctx).Preload("User").Preload("Motorbike").Preload("Motorbike.Photos").
 		Where("start_time >= ? AND end_time <= ? AND end_time IS NOT NULL", startTime, endTime).
 		Find(&rides).Error; err != nil {
 		return nil, err

@@ -4,21 +4,25 @@ import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	motorModel "motorbike-rental-backend/internal/app/motorbike/models"
+	motorService "motorbike-rental-backend/internal/app/motorbike/services"
 	"motorbike-rental-backend/internal/app/ride/models"
 	rideService "motorbike-rental-backend/internal/app/ride/services"
 	"motorbike-rental-backend/internal/app/ride/viewmodels"
 	"motorbike-rental-backend/pkg/app"
 	"motorbike-rental-backend/pkg/errorsx"
+	"motorbike-rental-backend/pkg/utils"
 	"strconv"
 	"time"
 )
 
 type RideHandler struct {
-	rideService rideService.IRideService
+	rideService  rideService.IRideService
+	motorService motorService.IMotorService
 }
 
-func NewRideHandler(s rideService.IRideService) RideHandler {
-	return RideHandler{rideService: s}
+func NewRideHandler(s rideService.IRideService, m motorService.IMotorService) RideHandler {
+	return RideHandler{rideService: s, motorService: m}
 }
 
 func (h RideHandler) GetAllRides(ctx *app.Ctx) error {
@@ -67,6 +71,29 @@ func (h RideHandler) CreateRide(ctx *app.Ctx) error {
 	}
 
 	ride := rideCreateVM.ToDBModel()
+
+	motor, err := h.motorService.GetMotorByID(ctx.Context(), int(ride.MotorbikeID))
+	if err != nil {
+		if errorsx.Is(err, gorm.ErrRecordNotFound) {
+			return errorsx.InternalError(err, "Böyle bir motorsiklet yok! Hatalı bağlantı isteği!")
+		}
+		return errorsx.InternalError(err, "Bir hata oluştu!")
+	}
+
+	if motor == nil {
+		return errorsx.InternalError(nil, "Motorbisiklet verisi alınamadı!")
+	}
+
+	// Motorbike'ın durumu 'Available' mı kontrol et
+	if motor.Status != motorModel.BikeAvailable {
+		return errorsx.BadRequestError("Bu Motorbisiklet şu anda müsait değil!")
+	}
+
+	motor.Status = motorModel.BikeRented
+
+	if err = h.motorService.UpdateMotor(ctx.Context(), motor); err != nil {
+		return errorsx.InternalError(err, "Sürüş oluşturulamadı!")
+	}
 
 	if err := h.rideService.CreateRide(ctx.Context(), &ride); err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Sürüş oluşturulurken hata oluştu!"})
@@ -180,6 +207,41 @@ func (h RideHandler) UpdateRideByID(ctx *app.Ctx) error {
 	rideDetail := vm.ToDBModel(updatedRide)*/ // eğer güncellediğimiz veriyi listelemek istersek rideDetail i gönder!
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Sürüş başarıyla güncellendi!"})
+}
+
+func (h RideHandler) FinishRide(ctx *app.Ctx) error {
+	id, err := utils.GetMyParamInt(ctx, "id")
+	if err != nil {
+		return errorsx.BadRequestError("Hatalı istek!")
+	}
+
+	ride, err := h.rideService.GetRideByID(ctx.Context(), id)
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Sürüş bulunamadı!"})
+	}
+
+	if ride.EndTime == nil {
+		now := time.Now().UTC()
+		ride.EndTime = &now
+
+		// Sürüş süresini hesapla// Sürüş süresini hesapla (StartTime bir pointer değilse)
+		duration := now.Sub(ride.StartTime)
+		ride.Duration = strconv.Itoa(int(duration.Seconds())) // Saniye cinsinden süreyi kaydet
+
+		// Süreyi dakika cinsinden hesapla (her dakika için 3 TL)
+		minutes := int(duration.Minutes())
+		costPerMinute := 3
+		ride.Cost = float64(minutes*costPerMinute) + 10
+	} else {
+		return errorsx.BadRequestError("Zaten sürüş bitirildi!")
+	}
+
+	err = h.rideService.UpdateRide(ctx.Context(), ride)
+	if err != nil {
+		return errorsx.InternalError(err, "Sürüş bitirilemedi!")
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"info": "Sürüş bitirildi!", "cost (TL)": ride.Cost})
 }
 
 func (h RideHandler) DeleteRide(ctx *app.Ctx) error {
