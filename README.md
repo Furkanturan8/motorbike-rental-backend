@@ -5,15 +5,9 @@ Bu proje, motorbike kiralama sistemi için geliştirilmiş bir backend uygulamas
 ## İçindekiler
 1. [Gereksinimler](#gereksinimler)
 2. [Kullanılan Teknolojiler](#kullanılan-teknolojiler)
-3. [Proje Kurulumu](#proje-kurulumu)
-   - [Depoyu Klonlayın](#depoyu-klonlayın)
-   - [Bağımlılıkları Yükleyin](#bağımlılıkları-yükleyin)
-   - [Çevresel Değişkenleri Yapılandırın](#çevresel-değişkenleri-yapılandırın)
-4. [Docker Veritabanı İşlemleri](#docker-veritabanı-işlemleri)
-5. [Migration İşlemleri](#migration-işlemleri)
-6. [Projenin Derlenmesi ve Çalıştırılması](#projenin-derlenmesi-ve-çalıştırılması)
-7. [API Endpoint'leri](#api-endpointleri)
+3. [API Endpoint'leri](#api-endpointleri)
    - [Kullanıcı ve Kimlik Doğrulama](#kullanıcı-ve-kimlik-doğrulama)
+   - [Admin'in User ile İlgili İşlemleri](#adminin-user-ile-ilgili-işlemleri)
    - [Motorbike İşlemleri](#motorbike-işlemleri)
    - [Sürüş İşlemleri](#sürüş-işlemleri)
    - [Harita İşlemleri](#harita-işlemleri)
@@ -36,135 +30,6 @@ Bu proje, motorbike kiralama sistemi için geliştirilmiş bir backend uygulamas
 - **Docker**: PostgreSQL veritabanını konteyner ortamında çalıştırmak için kullanılan araç.
 
 
-## Proje Kurulumu
-
-1. ### Depoyu Klonlayın
-
-    ```bash
-    git clone https://github.com/Furkanturan8/motorbike-rental-backend.git
-    cd motorbike-rental-backend
-    ```
-
-2. ### Bağımlılıkları Yükleyin
-
-    ```bash
-    go mod tidy
-    ```
-
-3. ### Çevresel Değişkenleri Yapılandırın
-
-   Projenizle birlikte bir `.env` dosyasına ihtiyacınız olacak. Aşağıdaki bilgileri doldurup `.env` dosyasını oluşturabilirsiniz:
-
-      ```
-      DB_DOCKER_CONTAINER=my_postgres_container
-      DB_USERNAME=your_db_username
-      DB_PASSWORD=your_db_password
-      DB_NAME=your_db_name
-      DB_HOST=localhost
-      DB_PORT=5432
-      SERVER_PORT=8080
-      DSN=postgres://your_db_username:your_db_password@localhost:5432/your_db_name?sslmode=disable
-      BINARY_NAME=motorbike-rental-backend
-      ```
-
-## Docker Veritabanı Işlemleri
-
-Veritabanı işlemlerini Docker üzerinde gerçekleştirmek için aşağıdaki komutları kullanabilirsiniz.
-
-1. **Diğer Docker Konteynerlerini Durdurmak İçin:**
-
-   ```bash
-   make stop_containers
-   ```
-
-   Bu komut, çalışan diğer Docker konteynerlerini durdurur.
-
-2. **Veritabanı Konteynerini Oluşturmak İçin:**
-
-   ```bash
-   make create_container
-   ```
-
-   Bu komut, PostgreSQL veritabanı konteynerini oluşturur ve çalıştırır.
-
-3. **Veritabanı Oluşturmak İçin:**
-
-   ```bash
-   make create_db
-   ```
-
-   Bu komut, PostgreSQL konteyneri içinde belirtilen kullanıcı ve veritabanı adıyla yeni bir veritabanı oluşturur.
-
-4. **Konteyneri Başlatmak İçin (Daha Önceden Oluşturulduysa):**
-
-   ```bash
-   make start_container
-   ```
-
-   Bu komut, daha önce oluşturulmuş bir PostgreSQL konteynerini başlatır.
-
-
-## Migration Işlemleri
-
-Veritabanı migration işlemlerini SQLX kullanarak gerçekleştirebilirsiniz.
-
-1. **Yeni Bir Migration Oluşturmak İçin:**
-
-   ```bash
-   make create_migrations
-   ```
-
-   Bu komut, `sqlx migrate` komutunu kullanarak yeni bir migration dosyası ekler.
-
-2. **Migration Yüklemek İçin (migrate up):**
-
-   ```bash
-   make migrate_up
-   ```
-
-   Bu komut, veritabanı üzerinde tanımlı migration'ları çalıştırır.
-
-3. **Migration Geri Almak İçin (migrate down):**
-
-   ```bash
-   make migrate_down
-   ```
-
-   Bu komut, en son yapılan migration'ı geri alır.
-
-## Projenin Derlenmesi ve Çalıştırılması
-
-1. **Binary Oluşturmak İçin:**
-
-   ```bash
-   make build
-   ```
-
-   Bu komut, projeyi derleyerek belirtilen binary dosyasını oluşturur.
-
-2. **API Sunucusunu Başlatmak İçin:**
-
-   ```bash
-   make start
-   ```
-
-   Bu komut, veritabanı konteynerini başlatır ve API sunucusunu çalıştırır.
-
-3. **API Sunucusunu Durdurmak İçin:**
-
-   ```bash
-   make stop
-   ```
-
-   Bu komut, çalışan API sunucusunu durdurur.
-
-4. **API Sunucusunu Yeniden Başlatmak İçin:**
-
-   ```bash
-   make restart
-   ```
-
-   Bu komut, önce sunucuyu durdurur, ardından yeniden başlatır.
 
 
 ## API Endpoint'leri
@@ -181,6 +46,17 @@ Aşağıda uygulamada kullanılan temel API endpoint'leri verilmiştir.
 | GET    | `/api/user/me`       | Giriş yapmış kullanıcının bilgilerini alır. |
 | PUT    | `/api/user/me`       | Giriş yapmış kullanıcının bilgilerini günceller. |
 | POST   | `/api/auth/logout`   | Kullanıcı çıkış işlemi.               |
+
+### Admin'in User Ile Ilgili Işlemleri
+
+| Method | Endpoint            | Açıklama                              |
+|--------|---------------------|---------------------------------------|
+| GET   | `/api/users`   | Tüm kullanıcıları getirir.         |
+| GET   | `/api/users/:id`    | Belirli bir kullanıcıyı getirir.               |
+| POST   | `/api/user/create`  | Yeni bir kullanıcı ekler.                |
+| POST    | `/api/user/createAdmin`       | Yeni bir admin ekler. |
+| DELETE    | `/api/user/:id`       | Kullanıcıyı siler. |
+| PUT   | `/api/user/update/:id`   | Kullanıcı bilgilerini günceller.               |
 
 ### Motorbike Işlemleri
 
