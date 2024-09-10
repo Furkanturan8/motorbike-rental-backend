@@ -6,9 +6,9 @@ Bu proje, motorbike kiralama sistemi için geliştirilmiş bir backend uygulamas
 1. [Gereksinimler](#gereksinimler)
 2. [Kullanılan Teknolojiler](#kullanılan-teknolojiler)
 3. [Proje Kurulumu](#proje-kurulumu)
-   - [Depoyu Klonlayın](*depoyu-klonlayın)
-   - [Bağımlılıkları Yükleyin](*bağımlılıkları-yükleyin)
-   - [Çevresel Değişkenleri Yapılandırın](*çevresel-değiskenleri-yapılandırın)
+   - [Depoyu Klonlayın](#depoyu-klonlayın)
+   - [Bağımlılıkları Yükleyin](#bağımlılıkları-yükleyin)
+   - [Çevresel Değişkenleri Yapılandırın](#çevresel-değişkenleri-yapılandırın)
 4. [Docker Veritabanı İşlemleri](*docker-veritabanı-işlemleri)
 5. [Migration İşlemleri](#migration-işlemleri)
 6. [Projenin Derlenmesi ve Çalıştırılması](#projenin-derlenmesi-ve-çalıştırılması)
@@ -38,20 +38,20 @@ Bu proje, motorbike kiralama sistemi için geliştirilmiş bir backend uygulamas
 
 ## Proje Kurulumu
 
-1. **Depoyu Klonlayın**
+1. ### Depoyu Klonlayın
 
     ```bash
     git clone https://github.com/Furkanturan8/motorbike-rental-backend.git
     cd motorbike-rental-backend
     ```
 
-2. **Bağımlılıkları Yükleyin**
+2. ### Bağımlılıkları Yükleyin
 
     ```bash
     go mod tidy
     ```
 
-3. **Çevresel Değişkenleri Yapılandırın**
+3. ### Çevresel Değişkenleri Yapılandırın
 
    Projenizle birlikte bir `.env` dosyasına ihtiyacınız olacak. Aşağıdaki bilgileri doldurup `.env` dosyasını oluşturabilirsiniz:
 
