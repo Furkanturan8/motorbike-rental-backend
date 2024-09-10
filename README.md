@@ -9,7 +9,7 @@ Bu proje, motorbike kiralama sistemi için geliştirilmiş bir backend uygulamas
    - [Depoyu Klonlayın](#depoyu-klonlayın)
    - [Bağımlılıkları Yükleyin](#bağımlılıkları-yükleyin)
    - [Çevresel Değişkenleri Yapılandırın](#çevresel-değişkenleri-yapılandırın)
-4. [Docker Veritabanı İşlemleri](*docker-veritabanı-işlemleri)
+4. [Docker Veritabanı İşlemleri](#docker-veritabanı-işlemleri)
 5. [Migration İşlemleri](#migration-işlemleri)
 6. [Projenin Derlenmesi ve Çalıştırılması](#projenin-derlenmesi-ve-çalıştırılması)
 7. [API Endpoint'leri](#api-endpointleri)
