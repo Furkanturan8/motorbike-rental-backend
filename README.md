@@ -38,7 +38,6 @@ Bu proje, motorbike kiralama sistemi için geliştirilmiş bir backend uygulamas
 
 ## Proje Kurulumu
 
-
 1. **Depoyu klonlayın:**
 
     ```bash
