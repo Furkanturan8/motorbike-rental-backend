@@ -6,10 +6,10 @@ Bu proje, motorbike kiralama sistemi için geliştirilmiş bir backend uygulamas
 1. [Gereksinimler](#gereksinimler)
 2. [Kullanılan Teknolojiler](#kullanılan-teknolojiler)
 3. [Proje Kurulumu](#proje-kurulumu)
-   - [Depoyu Klonlayın](#depoyu-klonlayın)
-   - [Bağımlılıkları Yükleyin](#bağımlılıkları-yükleyin)
-   - [Çevresel Değişkenleri Yapılandırın](#çevresel-değişkenleri-yapılandırın)
-4. [Docker Veritabanı İşlemleri](#docker-veritabanı-işlemleri)
+   - [Depoyu Klonlayın](*depoyu-klonlayın)
+   - [Bağımlılıkları Yükleyin](*bağımlılıkları-yükleyin)
+   - [Çevresel Değişkenleri Yapılandırın](*çevresel-değiskenleri-yapılandırın)
+4. [Docker Veritabanı İşlemleri](*docker-veritabanı-işlemleri)
 5. [Migration İşlemleri](#migration-işlemleri)
 6. [Projenin Derlenmesi ve Çalıştırılması](#projenin-derlenmesi-ve-çalıştırılması)
 7. [API Endpoint'leri](#api-endpointleri)
@@ -38,36 +38,36 @@ Bu proje, motorbike kiralama sistemi için geliştirilmiş bir backend uygulamas
 
 ## Proje Kurulumu
 
-1. **Depoyu klonlayın:**
+1. **Depoyu Klonlayın**
 
     ```bash
     git clone https://github.com/Furkanturan8/motorbike-rental-backend.git
     cd motorbike-rental-backend
     ```
 
-2. **Bağımlılıkları yükleyin:**
+2. **Bağımlılıkları Yükleyin**
 
     ```bash
     go mod tidy
     ```
 
-3. **Çevresel değişkenleri yapılandırın:**
+3. **Çevresel Değişkenleri Yapılandırın**
 
    Projenizle birlikte bir `.env` dosyasına ihtiyacınız olacak. Aşağıdaki bilgileri doldurup `.env` dosyasını oluşturabilirsiniz:
 
-```
-DB_DOCKER_CONTAINER=my_postgres_container
-DB_USERNAME=your_db_username
-DB_PASSWORD=your_db_password
-DB_NAME=your_db_name
-DB_HOST=localhost
-DB_PORT=5432
-SERVER_PORT=8080
-DSN=postgres://your_db_username:your_db_password@localhost:5432/your_db_name?sslmode=disable
-BINARY_NAME=motorbike-rental-backend
-```
+      ```
+      DB_DOCKER_CONTAINER=my_postgres_container
+      DB_USERNAME=your_db_username
+      DB_PASSWORD=your_db_password
+      DB_NAME=your_db_name
+      DB_HOST=localhost
+      DB_PORT=5432
+      SERVER_PORT=8080
+      DSN=postgres://your_db_username:your_db_password@localhost:5432/your_db_name?sslmode=disable
+      BINARY_NAME=motorbike-rental-backend
+      ```
 
-## Docker Veritabanı İşlemleri
+## Docker Veritabanı Işlemleri
 
 Veritabanı işlemlerini Docker üzerinde gerçekleştirmek için aşağıdaki komutları kullanabilirsiniz.
 
@@ -103,7 +103,8 @@ Veritabanı işlemlerini Docker üzerinde gerçekleştirmek için aşağıdaki k
 
    Bu komut, daha önce oluşturulmuş bir PostgreSQL konteynerini başlatır.
 
-## Migration İşlemleri
+
+## Migration Işlemleri
 
 Veritabanı migration işlemlerini SQLX kullanarak gerçekleştirebilirsiniz.
 
@@ -181,7 +182,7 @@ Aşağıda uygulamada kullanılan temel API endpoint'leri verilmiştir.
 | PUT    | `/api/user/me`       | Giriş yapmış kullanıcının bilgilerini günceller. |
 | POST   | `/api/auth/logout`   | Kullanıcı çıkış işlemi.               |
 
-### Motorbike İşlemleri
+### Motorbike Işlemleri
 
 | Method  | Endpoint                         | Açıklama                                  |
 |---------|---------------------------------- |-------------------------------------------|
@@ -195,7 +196,7 @@ Aşağıda uygulamada kullanılan temel API endpoint'leri verilmiştir.
 | GET     | `/api/rented-motorbikes`         | Kiralanmış motorbike'leri getirir.        |
 | GET     | `/api/motorbike-photos/:id`      | Belirli motorbike'in fotoğraflarını getirir. |
 
-### Sürüş İşlemleri
+### Sürüş Işlemleri
 
 | Method  | Endpoint                                       | Açıklama                                      |
 |---------|------------------------------------------------|-----------------------------------------------|
@@ -209,7 +210,7 @@ Aşağıda uygulamada kullanılan temel API endpoint'leri verilmiştir.
 | GET     | `/api/rides/user/:userID/filter?start_time=...`| Tarih aralığına göre kullanıcı sürüşleri getirir.|
 | GET     | `/api/motorbike/:bikeID/rides`                 | Belirli bir motorbike'e ait sürüşleri getirir.|
 
-### Harita İşlemleri
+### Harita Işlemleri
 
 | Method  | Endpoint                               | Açıklama                                 |
 |---------|----------------------------------------|------------------------------------------|
@@ -221,7 +222,7 @@ Aşağıda uygulamada kullanılan temel API endpoint'leri verilmiştir.
 | PUT     | `/api/map/update/:id`                  | Harita bilgilerini günceller.            |
 | PUT     | `/api/motorbikes/:motorbikeID/map/update` | Motorbike'e ait haritayı günceller.   |
 
-### Bluetooth Bağlantı İşlemleri
+### Bluetooth Bağlantı Işlemleri
 
 | Method  | Endpoint                                    | Açıklama                                  |
 |---------|---------------------------------------------|-------------------------------------------|
