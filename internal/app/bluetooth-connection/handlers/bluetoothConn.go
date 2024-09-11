@@ -49,6 +49,7 @@ func (h ConnHandler) Connect(ctx *app.Ctx) error {
 	}
 
 	connection := connVM.ToDBModel()
+	connection.ConnectedAt = time.Now()
 
 	motor, err := h.motorService.GetMotorByID(ctx.Context(), int(connVM.MotorbikeID))
 	if err != nil {
@@ -71,14 +72,14 @@ func (h ConnHandler) Connect(ctx *app.Ctx) error {
 }
 
 // when disconnect the motor status = available. but the lock status does not change. The lock status will be checked when the user sends a photo!
-func (h ConnHandler) Disconnect(ctx *app.Ctx) error {
-	param := ctx.Params("id")
+func (h ConnHandler) Disconnect(ctx *app.Ctx, id int) error {
+	/*param := ctx.Params("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
 		return errorsx.BadRequestError("Hatalı istek!")
-	}
+	}*/
 
-	connection, err := h.connService.GetConnByParam(ctx.Context(), "id", id)
+	connection, err := h.connService.GetConnByParam(ctx.Context(), "motorbike_id", id)
 	if err != nil {
 		if errorsx.Is(err, gorm.ErrRecordNotFound) {
 			return errorsx.NotFoundError("Böyle bir bağlantı yok!")

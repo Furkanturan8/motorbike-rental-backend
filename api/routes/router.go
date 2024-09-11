@@ -33,14 +33,14 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	motorService := _motorService.NewMotorService(app.DB)
 	motorHandler := _motorHandler.NewMotorHandler(motorService)
 
-	rideService := _rideService.NewRideService(app.DB)
-	rideHandler := _rideHandler.NewRideHandler(rideService, motorService)
-
 	mapService := _mapService.NewMapService(app.DB)
 	mapHandler := _mapHandler.NewMapHandler(mapService, motorService)
 
 	connService := _connService.NewConnService(app.DB)
 	connHandler := _connHandler.NewConnHandler(connService, motorService)
+
+	rideService := _rideService.NewRideService(app.DB)
+	rideHandler := _rideHandler.NewRideHandler(rideService, motorService, connHandler)
 
 	api := app.FiberApp.Group("/api")
 
@@ -64,7 +64,7 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Get(adminRoutes, "/users/:id", userHandler.GetByUserID)
 	router.Post(adminRoutes, "/user/create", userHandler.CreateUser)
 	router.Post(adminRoutes, "/user/createAdmin", userHandler.CreateAdmin)
-	router.Post(adminRoutes, "/user/:id", userHandler.DeleteByUserID)
+	router.Delete(adminRoutes, "/user/:id", userHandler.DeleteByUserID)
 	router.Put(adminRoutes, "/user/update/:id", userHandler.UpdateUserByID)
 
 	// motorbike operations
@@ -90,9 +90,7 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Get(adminRoutes, "/filtered-rides", rideHandler.GetRidesByDateRange)              // belirli tarih aralıklarındaki sürüşleri getirir -> /filtered-rides?start_time=2024-09-04&end_time=2024-09-05
 	router.Get(adminRoutes, "/rides/user/:userID/filter", rideHandler.GetRidesByUserAndDate) // userID ye göre belirli tarihler arasında getirir -> /rides/user/:userID/filter?start_time=2024-09-01&end_time=2024-09-09
 	router.Put(adminRoutes, "/ride/finish/:id", rideHandler.FinishRide)
-
-	// todo-1 : sürüşü bitir fonksiyonu ekle! UpdateRide ile yapmak güvenlik açığına neden olabilir. UpdateRide sadece admin için kullanılacak!
-	// todo-2 : user, sürüşü bitirince kilitledikten sonra fotoğraflarını ekleyecek. Bunun için bir fotoğraf ekleme fonksiyonu yazılacak! Onaylanırsa yani gerçekten kitlenirse Disconnect fonksiyonunu çağıracak ve bağlantıyı koparacak! Şimdilik senaryo bu şekilde ilerleyen zamanlarda bakarız!
+	router.Post(adminRoutes, "/ride/:id/photo", rideHandler.AddRidePhoto)
 
 	// map operations
 	router.Post(adminRoutes, "/map", mapHandler.CreateMap)
@@ -105,10 +103,15 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 
 	// bluetooth connection operations
 	router.Get(adminRoutes, "/connections", connHandler.GetAllConnections)
-	router.Get(adminRoutes, "/connection/:id", connHandler.GetConnByID)
-	router.Post(adminRoutes, "/connection/connect", connHandler.Connect)           // connect
-	router.Post(adminRoutes, "/connection/disconnect/:id", connHandler.Disconnect) // disconnect
+	router.Get(adminRoutes, "/connections/:id", connHandler.GetConnByID)
+	router.Post(adminRoutes, "/connection/connect", connHandler.Connect) // connect
+	// router.Post(adminRoutes, "/connection/disconnect/:id", connHandler.Disconnect) // disconnect
 	router.Delete(adminRoutes, "/connection/:id", connHandler.DeleteConn)
 	router.Get(adminRoutes, "/connection/motorbike/:motorbikeID", connHandler.GetConnByMotorID)
 	router.Get(adminRoutes, "/connection/user/:userID", connHandler.GetConnByUserID)
 }
+
+// Sürüşü bitirme işlem süreci:
+// önce kullanıcı motoru kitleyecek, (burada özel bir işlem yapılmalı, kitlendiğinde bana bilgi gelmesi gerekiyor! Burada bluetooth cihazı bana info atacak!)
+// daha sonra kullanıcı fotoğrafı yükleyecek, disconnect fonksiyonu çalışacak (motor available olacak)
+// daha sonra finishRide fonksiyonuna istek atılacak! Ve burada işlem ücreti çıkacak! Buradan payment fonksiyonuna istek atılıp para alınacak!

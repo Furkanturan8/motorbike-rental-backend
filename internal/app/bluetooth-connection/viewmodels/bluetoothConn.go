@@ -9,16 +9,16 @@ import (
 
 // BluetoothConnectionCreateVM is the view model for creating a new Bluetooth connection
 type BluetoothConnectionCreateVM struct {
-	UserID      uint      `json:"user_id" validate:"required"`
-	MotorbikeID uint      `json:"motorbike_id" validate:"required"`
-	ConnectedAt time.Time `json:"connected_at" validate:"required"`
+	UserID      uint `json:"user_id" validate:"required"`
+	MotorbikeID uint `json:"motorbike_id" validate:"required"`
+	//	ConnectedAt time.Time `json:"connected_at" validate:"required"`
 }
 
 func (vm *BluetoothConnectionCreateVM) ToDBModel() models.BluetoothConnection {
 	return models.BluetoothConnection{
 		UserID:      vm.UserID,
 		MotorbikeID: vm.MotorbikeID,
-		ConnectedAt: vm.ConnectedAt,
+		//	ConnectedAt: vm.ConnectedAt,
 	}
 }
 

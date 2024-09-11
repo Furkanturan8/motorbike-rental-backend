@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	connHandler "motorbike-rental-backend/internal/app/bluetooth-connection/handlers"
 	motorModel "motorbike-rental-backend/internal/app/motorbike/models"
 	motorService "motorbike-rental-backend/internal/app/motorbike/services"
 	"motorbike-rental-backend/internal/app/ride/models"
@@ -12,6 +14,7 @@ import (
 	"motorbike-rental-backend/pkg/app"
 	"motorbike-rental-backend/pkg/errorsx"
 	"motorbike-rental-backend/pkg/utils"
+	"path/filepath"
 	"strconv"
 	"time"
 )
@@ -19,10 +22,11 @@ import (
 type RideHandler struct {
 	rideService  rideService.IRideService
 	motorService motorService.IMotorService
+	connHandler  connHandler.ConnHandler
 }
 
-func NewRideHandler(s rideService.IRideService, m motorService.IMotorService) RideHandler {
-	return RideHandler{rideService: s, motorService: m}
+func NewRideHandler(s rideService.IRideService, m motorService.IMotorService, c connHandler.ConnHandler) RideHandler {
+	return RideHandler{rideService: s, motorService: m, connHandler: c}
 }
 
 func (h RideHandler) GetAllRides(ctx *app.Ctx) error {
@@ -236,6 +240,16 @@ func (h RideHandler) FinishRide(ctx *app.Ctx) error {
 		return errorsx.BadRequestError("Zaten sürüş bitirildi!")
 	}
 
+	// Motorbike'in kilitlenmiş olup olmadığını kontrol et
+	motorbike, err := h.motorService.GetMotorByID(ctx.Context(), int(ride.MotorbikeID))
+	if err != nil {
+		return errorsx.InternalError(err, "Motorbike bilgileri alınamadı!")
+	}
+
+	if motorbike.LockStatus != motorModel.Locked {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Motorbike kilitlenmedi! Lütfen önce kilitleyin!"})
+	}
+
 	err = h.rideService.UpdateRide(ctx.Context(), ride)
 	if err != nil {
 		return errorsx.InternalError(err, "Sürüş bitirilemedi!")
@@ -349,4 +363,48 @@ func (h RideHandler) GetRidesByUserAndDate(ctx *app.Ctx) error {
 	}
 
 	return ctx.SuccessResponse(rideDetails, len(rideDetails))
+}
+
+// Kullanıcı sürüşü bitirip motoru kilitlediğinde, /ride/:id/photo rotasına bir POST isteğiyle fotoğrafı yükler.
+// API önce fotoğrafı yükler, ardından motorun kilitli olup olmadığını kontrol eder.
+// Eğer motor kilitliyse, Bluetooth bağlantısını keser ve bu bilgiyi yanıt olarak döner.
+func (h RideHandler) AddRidePhoto(ctx *app.Ctx) error {
+	rideID, err := utils.GetMyParamInt(ctx, "id")
+	if err != nil {
+		return err
+	}
+	// Fotoğrafı yükle
+	photo, err := ctx.FormFile("photo")
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Photo upload failed"})
+	}
+
+	// Dosya kaydedileceği yol
+	fileDir := fmt.Sprintf("uploads/rides")
+	filePath := filepath.Join(fileDir, "ride_id_"+strconv.Itoa(rideID)+"_name_"+photo.Filename)
+
+	// Fotoğrafı kaydet
+	if err = ctx.SaveFile(photo, filePath); err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to save photo"})
+	}
+
+	// Motorun kilitlenip kilitlenmediğini kontrol et (örneğin rideService üzerinden)
+	ride, err := h.rideService.GetRideByID(ctx.Context(), rideID)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Ride not found"})
+	}
+
+	// Eğer motor kilitlendiyse bağlantıyı kes
+	if ride.Motorbike.LockStatus != motorModel.Locked {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Please lock the bike!"})
+	}
+
+	err = h.connHandler.Disconnect(ctx, int(ride.MotorbikeID))
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to disconnect"})
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "Photo uploaded successfully and motorbike disconnected",
+	})
 }
