@@ -71,9 +71,9 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Post(adminRoutes, "/motorbike", motorHandler.CreateMotor)
 	router.Put(adminRoutes, "/motorbike/:id", motorHandler.UpdateMotor)
 	router.Delete(adminRoutes, "/motorbike/:id", motorHandler.DeleteMotor)
-	router.Get(adminRoutes, "/motorbikes", motorHandler.GetAllMotors)
-	router.Get(adminRoutes, "/motorbikes/:id", motorHandler.GetMotorByID)
-	router.Get(adminRoutes, "/available-motorbikes", motorHandler.GetAvailableMotors)
+	router.Get(api, "/motorbikes", motorHandler.GetAllMotors)
+	router.Get(api, "/motorbikes/:id", motorHandler.GetMotorByID)
+	router.Get(api, "/available-motorbikes", motorHandler.GetAvailableMotors)
 	router.Get(adminRoutes, "/maintenance-motorbikes", motorHandler.GetMaintenanceMotors)
 	router.Get(adminRoutes, "/rented-motorbikes", motorHandler.GetRentedMotors)
 	router.Get(adminRoutes, "/motorbike-photos/:id", motorHandler.GetPhotosByID)
@@ -81,34 +81,34 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	// ride operations
 	router.Get(adminRoutes, "/rides", rideHandler.GetAllRides)
 	router.Get(adminRoutes, "/rides/:id", rideHandler.GetRideByID)
-	router.Post(adminRoutes, "/ride", rideHandler.CreateRide)
+	router.Post(api, "/ride", rideHandler.CreateRide)
 	router.Get(adminRoutes, "/rides/user/:userID", rideHandler.GetRidesByUserID) // Belirli bir kullanıcıya ait tüm kiralamaları getirme
-	router.Get(adminRoutes, "/users/:userID/rides/:rideID", rideHandler.GetRideByUserID)
+	router.Get(api, "/users/:userID/rides/:rideID", rideHandler.GetRideByUserID) // frontend'de getRideByMe olarak sadece her kullanıcının kendi id'leri gitmeli.
 	router.Get(adminRoutes, "/motorbike/:bikeID/rides", rideHandler.GetRidesByBikeID)
 	router.Put(adminRoutes, "/ride/update/:id", rideHandler.UpdateRideByID)
 	router.Delete(adminRoutes, "/ride/:id", rideHandler.DeleteRide)
-	router.Get(adminRoutes, "/filtered-rides", rideHandler.GetRidesByDateRange)              // belirli tarih aralıklarındaki sürüşleri getirir -> /filtered-rides?start_time=2024-09-04&end_time=2024-09-05
-	router.Get(adminRoutes, "/rides/user/:userID/filter", rideHandler.GetRidesByUserAndDate) // userID ye göre belirli tarihler arasında getirir -> /rides/user/:userID/filter?start_time=2024-09-01&end_time=2024-09-09
-	router.Put(adminRoutes, "/ride/finish/:id", rideHandler.FinishRide)
-	router.Post(adminRoutes, "/ride/:id/photo", rideHandler.AddRidePhoto)
+	router.Get(adminRoutes, "/filtered-rides", rideHandler.GetRidesByDateRange)      // belirli tarih aralıklarındaki sürüşleri getirir -> /filtered-rides?start_time=2024-09-04&end_time=2024-09-05
+	router.Get(api, "/rides/user/:userID/filter", rideHandler.GetRidesByUserAndDate) // userID ye göre belirli tarihler arasında getirir -> /rides/user/:userID/filter?start_time=2024-09-01&end_time=2024-09-09
+	router.Put(api, "/ride/finish/:id", rideHandler.FinishRide)
+	router.Post(api, "/ride/:id/photo", rideHandler.AddRidePhoto)
 
 	// map operations
 	router.Post(adminRoutes, "/map", mapHandler.CreateMap)
 	router.Delete(adminRoutes, "/map/:id", mapHandler.DeleteMap)
-	router.Get(adminRoutes, "/maps", mapHandler.GetAllMaps)
-	router.Get(adminRoutes, "/maps/:id", mapHandler.GetMapByID)
-	router.Get(adminRoutes, "/motorbikes/:motorbikeID/map", mapHandler.GetMapByMotorID)
+	router.Get(api, "/maps", mapHandler.GetAllMaps)
+	router.Get(api, "/maps/:id", mapHandler.GetMapByID)
+	router.Get(api, "/motorbikes/:motorbikeID/map", mapHandler.GetMapByMotorID)
 	router.Put(adminRoutes, "/map/update/:id", mapHandler.UpdateMap)
 	router.Put(adminRoutes, "/motorbikes/:motorbikeID/map/update", mapHandler.UpdateMapByMotorID)
 
 	// bluetooth connection operations
 	router.Get(adminRoutes, "/connections", connHandler.GetAllConnections)
-	router.Get(adminRoutes, "/connections/:id", connHandler.GetConnByID)
-	router.Post(adminRoutes, "/connection/connect", connHandler.Connect) // connect
-	// router.Post(adminRoutes, "/connection/disconnect/:id", connHandler.Disconnect) // disconnect
-	router.Delete(adminRoutes, "/connection/:id", connHandler.DeleteConn)
+	router.Get(api, "/connections/:id", connHandler.GetConnByID)
 	router.Get(adminRoutes, "/connection/motorbike/:motorbikeID", connHandler.GetConnByMotorID)
-	router.Get(adminRoutes, "/connection/user/:userID", connHandler.GetConnByUserID)
+	router.Get(api, "/connection/user/:userID", connHandler.GetConnByUserID)
+	router.Post(api, "/connection/connect", connHandler.Connect) // connect
+	router.Delete(adminRoutes, "/connection/:id", connHandler.DeleteConn)
+	// router.Post(adminRoutes, "/connection/disconnect/:id", connHandler.Disconnect) // disconnect
 }
 
 // Sürüşü bitirme işlem süreci:
