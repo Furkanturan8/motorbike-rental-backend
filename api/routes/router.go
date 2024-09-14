@@ -48,6 +48,9 @@ func (IdareRouter) RegisterRoutes(app *app.App) {
 	router.Post(api, "/auth/login", authHandler.Login)
 	router.Post(api, "/auth/refresh", authHandler.RefreshToken)
 
+	// admin panel login
+	router.Post(api, "/auth/admin/login", authHandler.LoginAdminPanel)
+
 	api.Use(router.JWTMiddleware(app))
 
 	router.Get(api, "/user/me", userHandler.Me)

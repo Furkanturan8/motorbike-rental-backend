@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"github.com/golang-jwt/jwt/v4"
+	"motorbike-rental-backend/internal/app/user-and-auth/models"
 	"motorbike-rental-backend/internal/app/user-and-auth/services"
 	"motorbike-rental-backend/internal/app/user-and-auth/viewmodels"
 	"motorbike-rental-backend/pkg/app"
@@ -38,6 +39,46 @@ func (h AuthHandler) Login(ctx *app.Ctx) error {
 	user, err := h.userService.GetByEmail(ctx.Context(), utils.EmailTemizle(vm.Email))
 	if err != nil {
 		return err
+	}
+
+	ok := utils.CheckPasswordHash(strings.TrimSpace(vm.Password), user.Password)
+	if !ok {
+		return errorsx.UnauthorizedError("Hatalı Email veya Parola")
+	}
+
+	refreshTokenID := uuid.New()
+	tokens, err := h.authService.GenerateTokenPair(user.ID, refreshTokenID, float64(user.Role))
+	if err != nil {
+		return errorsx.InternalError(err)
+	}
+	// fmt.Println(user.ID, "bu user id") --> we used for debug
+	err = h.authService.CreateAuthRefreshToken(ctx.Context(), refreshTokenID, user.ID, float64(user.Role))
+	if err != nil {
+		return err
+	}
+
+	result := viewmodel.AuthTokenVM{
+		AccessToken:  tokens.AccessToken,
+		RefreshToken: tokens.RefreshToken,
+	}
+	return ctx.SuccessResponse(result)
+}
+
+func (h AuthHandler) LoginAdminPanel(ctx *app.Ctx) error {
+	var vm viewmodel.AuthLoginVM
+
+	// POST isteğinden gelen verileri al
+	if err := ctx.BodyParseValidate(&vm); err != nil {
+		return errorsx.ValidationError(err)
+	}
+
+	user, err := h.userService.GetByEmail(ctx.Context(), utils.EmailTemizle(vm.Email))
+	if err != nil {
+		return err
+	}
+
+	if user.Role != models.UserRoleAdmin {
+		return errorsx.BadRequestError("Yetkisiz Giriş Denemesi! Yalnızca Adminler Girebilir!")
 	}
 
 	ok := utils.CheckPasswordHash(strings.TrimSpace(vm.Password), user.Password)
